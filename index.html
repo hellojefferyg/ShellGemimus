@@ -1,0 +1,2877 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Geminus - Aether Onyx v2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --neon-red: #FF375F;
+  --neon-blue: #0A84FF;
+  --neon-cyan: #3EE0FF;
+  --neon-green: #30D158;
+  --neon-gold: #FFD60A;
+  --steel-blue: #8FA8C7;
+  --bright-orange: #FF9500;
+  
+  --highlight-color: #061018;
+  --highlight-color-rgb: 6, 16, 24;
+  --glow-color: #3EE0FF;
+  
+  --liquid-glass-bg: rgba(3, 12, 20, 0.76);
+  --liquid-glass-border: rgba(62, 224, 255, 0.42);
+  --liquid-glass-specular: linear-gradient(135deg, rgba(62, 224, 255, 0.28) 0%, rgba(0, 0, 0, 0.42) 24%, rgba(62, 224, 255, 0.05) 55%, rgba(0, 8, 14, 0.9) 100%);
+  --liquid-rim-glow: inset 0 1px 1.5px 0 rgba(62, 224, 255, 0.38), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.8), 0 8px 28px rgba(0, 0, 0, 0.92), 0 0 28px rgba(62, 224, 255, 0.22);
+  
+  --glow-caster: #0A84FF;
+  --glow-fighter: #FF375F;
+  --glow-misc: #30D158;
+}
+
+html, body {
+  min-height: 100%;
+  min-height: 100dvh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Inter", sans-serif;
+  background: radial-gradient(circle at 50% 8%, #143044 0%, #0a1a26 38%, #03080c 100%);
+  color: var(--text-primary);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1, "cv02" 1, "cv03" 1;
+  position: relative;
+}
+
+#smoke-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', -apple-system, sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.glass-panel {
+  background: var(--liquid-glass-bg);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  box-shadow: var(--liquid-rim-glow);
+  position: relative;
+  border-radius: 1.2rem;
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--liquid-glass-specular);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.info-cell {
+  background: rgba(0, 8, 14, 0.7);
+  border: 1px solid rgba(62, 224, 255, 0.32);
+  border-radius: 0.75rem;
+  box-shadow: inset 0 1px 1px rgba(62, 224, 255, 0.12), 0 3px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.info-cell:hover {
+  border-color: rgba(62, 224, 255, 0.45);
+  background: rgba(6, 18, 26, 0.85);
+  box-shadow: inset 0 1px 1px rgba(62, 224, 255, 0.2), 0 0 12px rgba(62, 224, 255, 0.18);
+}
+
+.glass-button {
+  background: linear-gradient(180deg, #10202a 0%, #05090c 100%);
+  border: 1px solid rgba(62, 224, 255, 0.42);
+  color: #e8fbff;
+  border-radius: 0.8rem;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 1px rgba(62, 224, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.glass-button:not(:disabled):hover, .glass-button.active {
+  background: #061018;
+  border-color: #3EE0FF;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(62, 224, 255, 0.35), inset 0 1px 2px rgba(62, 224, 255, 0.45);
+  transform: translateY(-0.5px);
+}
+
+.glass-button:disabled {
+  background: rgba(10, 10, 12, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  cursor: not-allowed;
+  color: #475569 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.hud-nav-pill, .game-key, .battle-mode-btn, .footer-tab-button, .chat-expand-btn {
+  background: linear-gradient(180deg, #12232d 0%, #060c10 100%);
+  border: 1px solid rgba(62, 224, 255, 0.48);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(62, 224, 255, 0.28), 0 0 16px rgba(62, 224, 255, 0.22);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+  user-select: none;
+  color: #e8fbff;
+}
+
+.hud-nav-pill {
+  border-radius: 9999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.battle-mode-btn {
+  border-radius: 0.75rem;
+  padding: 0.38rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #d9f8ff;
+  text-shadow: 0 0 8px rgba(62, 224, 255, 0.45);
+}
+
+.footer-tab-button {
+  border-radius: 0.75rem;
+  padding: 0.42rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-expand-btn {
+  border-radius: 0.75rem;
+  width: 34px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.hud-nav-pill:hover, .game-key:hover, .battle-mode-btn:hover, .footer-tab-button:hover, .chat-expand-btn:hover {
+  background: linear-gradient(180deg, #17303c 0%, #0a141a 100%);
+  border-color: rgba(62, 224, 255, 0.7);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(62, 224, 255, 0.35), inset 0 1px 2px rgba(62, 224, 255, 0.35);
+  transform: translateY(-0.5px);
+}
+
+.hud-nav-pill.tab-active, .game-key.pressed, .game-key:active, .battle-mode-btn:active, .footer-tab-button.active, .chat-expand-btn:active {
+  background: #041016 !important;
+  border-color: #3EE0FF !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(62, 224, 255, 0.5), inset 0 1px 2px rgba(62, 224, 255, 0.7) !important;
+  transform: scale(0.96);
+}
+
+.game-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.move-key { width: 44px; height: 40px; font-size: 16px; }
+.move-key svg { width: 20px; height: 20px; fill: currentColor; }
+
+.key-enter-btn {
+  width: 44px;
+  height: 40px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #d9f8ff;
+  text-shadow: 0 0 8px rgba(62, 224, 255, 0.55);
+}
+
+.d-pad-controls { 
+  display: grid; 
+  grid-template-columns: repeat(3, 44px); 
+  grid-template-rows: repeat(3, 40px); 
+  grid-template-areas: ". up ." "left enter right" ". down ."; 
+  gap: 5.5px; 
+  justify-content: center; 
+}
+[data-key="up"] { grid-area: up; } 
+[data-key="left"] { grid-area: left; } 
+[data-key="enter"] { grid-area: enter; } 
+[data-key="down"] { grid-area: down; } 
+[data-key="right"] { grid-area: right; }
+
+.pin-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pin-btn.pinned {
+  background: rgba(255, 214, 10, 0.25);
+  border-color: #FFD60A;
+  color: #FFD60A;
+  box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+}
+
+#hud-section, #inline-panel {
+  border-radius: 1.2rem;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1);
+}
+
+#inline-panel {
+  display: none;
+  position: relative;
+}
+
+#inline-panel.visible {
+  display: flex;
+  flex-direction: column;
+}
+
+#hud-section.hidden-hud {
+  display: none;
+}
+
+#inline-panel-body::-webkit-scrollbar { width: 4px; }
+#inline-panel-body::-webkit-scrollbar-track { background: transparent; }
+#inline-panel-body::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.22); border-radius: 9999px; }
+
+#combat-console-card {
+  min-height: 182px;
+  height: 182px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#combat-action-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding-top: 0.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  height: 40px;
+}
+
+#combat-action-row.standby {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.combat-tactile-btn {
+  height: 36px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.2, 0.9, 0.3, 1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.combat-cast-slab {
+  background: linear-gradient(180deg, rgba(10, 132, 255, 0.36) 0%, rgba(10, 132, 255, 0.12) 100%);
+  border: 1.5px solid rgba(10, 132, 255, 0.85);
+  color: #0A84FF;
+  text-shadow: 0 0 14px rgba(10, 132, 255, 0.7);
+}
+
+.combat-cast-slab:hover {
+  background: linear-gradient(180deg, rgba(10, 132, 255, 0.5) 0%, rgba(10, 132, 255, 0.22) 100%);
+  box-shadow: 0 0 24px rgba(10, 132, 255, 0.5), inset 0 1px 2px rgba(255,255,255,0.7);
+  transform: translateY(-0.5px);
+}
+
+.combat-cast-slab:active {
+  transform: scale(0.97);
+  filter: brightness(1.25);
+}
+
+.combat-fight-slab {
+  background: linear-gradient(180deg, rgba(255, 55, 95, 0.36) 0%, rgba(255, 55, 95, 0.12) 100%);
+  border: 1.5px solid rgba(255, 55, 95, 0.85);
+  color: #FF375F;
+  text-shadow: 0 0 14px rgba(255, 55, 95, 0.7);
+}
+
+.combat-fight-slab:hover {
+  background: linear-gradient(180deg, rgba(255, 55, 95, 0.5) 0%, rgba(255, 55, 95, 0.22) 100%);
+  box-shadow: 0 0 24px rgba(255, 55, 95, 0.5), inset 0 1px 2px rgba(255,255,255,0.7);
+  transform: translateY(-0.5px);
+}
+
+.combat-fight-slab:active {
+  transform: scale(0.97);
+  filter: brightness(1.25);
+}
+
+.combat-engage-btn {
+  padding: 0.5rem 1.15rem;
+  height: 38px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, #5AF0FF 0%, #1498B8 100%) !important;
+  border: 1.5px solid #7AF7FF !important;
+  color: #031018 !important;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 22px rgba(62, 224, 255, 0.7), inset 0 1px 1.5px rgba(255, 255, 255, 0.45), 0 3px 10px rgba(0, 0, 0, 0.7) !important;
+  transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: none !important;
+}
+
+.combat-engage-btn:hover {
+  background: linear-gradient(180deg, #7AF7FF 0%, #1AA8C8 100%) !important;
+  box-shadow: 0 0 28px rgba(62, 224, 255, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.7), 0 4px 14px rgba(0, 0, 0, 0.8) !important;
+  transform: translateY(-0.5px);
+}
+
+.combat-engage-btn:active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
+}
+
+.combat-engage-btn.active {
+  background: linear-gradient(180deg, #18181c 0%, #000000 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.combat-engage-btn.active:hover {
+  background: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 4px 14px rgba(0, 0, 0, 0.9);
+}
+
+.editor-input {
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 0.75rem;
+  width: 100%;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.editor-input:focus {
+  outline: none;
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
+}
+
+.stat-accordion-item {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 0.75rem;
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.stat-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  border: none;
+  text-align: left;
+}
+
+.accordion-arrow {
+  transition: transform 0.25s ease;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stat-accordion-item.open .accordion-arrow {
+  transform: rotate(90deg);
+}
+
+.stat-accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+  padding: 0 0.75rem;
+}
+
+.stat-accordion-item.open .stat-accordion-content {
+  max-height: 1400px;
+  padding: 0.75rem;
+}
+
+.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 0.5rem; }
+.inventory-slot { position: relative; width: 100%; padding-bottom: 100%; height: 0; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 0.75rem; background: rgba(0, 0, 0, 0.65); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12); cursor: pointer; transition: all 0.2s; }
+.inventory-slot:hover { border-color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 255, 255, 0.25); }
+.inventory-slot .item-icon-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 7px; }
+.item-tier-label { position: absolute; bottom: 3px; right: 3px; background: rgba(255, 214, 10, 0.95); font-size: 0.6rem; font-weight: 800; padding: 1px 4px; border-radius: 4px; color: #09090b; }
+
+.gem-overlays-container {
+  position: absolute;
+  top: 3px; left: 3px; right: 3px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.gem-overlay {
+  padding: 1px 3.5px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: white;
+  border-radius: 3px;
+  text-shadow: 1px 1px 2px black;
+  border: 1px solid rgba(0,0,0,0.6);
+}
+
+.gem-overlay.fighter { background-color: var(--glow-fighter); }
+.gem-overlay.caster { background-color: var(--glow-caster); }
+.gem-overlay.misc { background-color: var(--glow-misc); }
+
+.gem-pouch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 0.45rem; }
+.gem-item { position: relative; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 0.65rem; background: rgba(0, 0, 0, 0.6); cursor: pointer; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: all 0.2s; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.gem-item:hover { border-color: #ffffff; transform: scale(1.05); box-shadow: 0 0 10px rgba(255, 255, 255, 0.25); }
+.gem-item .item-label { position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); font-size: 0.58rem; font-weight: 700; padding: 1px 3px; border-radius: 3px; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1); }
+
+.equipment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+.equipment-slot-wrapper { background-color: rgba(0, 0, 0, 0.5); border-radius: 0.85rem; padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.12); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.equipment-slot-title { font-size: 0.7rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.35rem; }
+.equipment-slot-content { display: flex; align-items: center; justify-content: center; border-radius: 0.65rem; min-height: 48px; padding: 4px; position: relative; background-color: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; transition: all 0.2s; }
+.equipment-slot-content:hover { border-color: #ffffff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.25); }
+
+.attr-btn {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #52525b;
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: not-allowed;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.attr-btn.glow-white, .attr-btn:not(:disabled) {
+  cursor: pointer;
+  background: #051016;
+  border: 1.5px solid #3EE0FF;
+  color: #3EE0FF;
+  box-shadow: 0 0 12px rgba(62, 224, 255, 0.9), inset 0 0 4px rgba(62, 224, 255, 0.45);
+  animation: cyanPulseGlow 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes cyanPulseGlow {
+  0% {
+    box-shadow: 0 0 8px rgba(62, 224, 255, 0.55), inset 0 0 3px rgba(62, 224, 255, 0.3);
+    border-color: rgba(62, 224, 255, 0.75);
+  }
+  100% {
+    box-shadow: 0 0 18px rgba(62, 224, 255, 1), inset 0 0 7px rgba(62, 224, 255, 0.7);
+    border-color: #3EE0FF;
+  }
+}
+
+.attr-btn.glow-white:hover {
+  background: #0a1c26;
+  transform: scale(1.08);
+  box-shadow: 0 0 22px rgba(62, 224, 255, 1), inset 0 0 8px rgba(62, 224, 255, 0.85);
+}
+
+.attr-btn.glow-white:active {
+  transform: scale(0.92);
+  background: #ffffff;
+  color: #000000;
+}
+
+.attr-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #3f3f46;
+  box-shadow: none;
+  animation: none;
+}
+
+.chat-bubble { background: rgba(8, 8, 12, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.14); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.chat-bubble-user { border-color: rgba(255, 255, 255, 0.28); background: linear-gradient(180deg, rgba(24, 24, 28, 0.85) 0%, rgba(10, 10, 14, 0.9) 100%) !important; box-shadow: 0 4px 14px rgba(0,0,0,0.6); }
+.combat-floating-effect { position: absolute; pointer-events: none; font-weight: 800; font-size: 0.92rem; animation: floatCombatText 1.4s cubic-bezier(0.1,0.8,0.2,1) forwards; z-index: 40; text-shadow: 0 2px 10px rgba(0,0,0,0.95); }
+@keyframes floatCombatText { 0% { opacity:0; transform:translate(-50%,0) scale(0.7); } 15% { opacity:1; transform:translate(-50%,-10px) scale(1.1); } 30% { transform:translate(-50%,-16px) scale(1.0); } 80% { opacity:0.9; transform:translate(-50%,-36px) scale(0.95); } 100% { opacity:0; transform:translate(-50%,-48px) scale(0.8); } }
+.sub-bar { display:flex; gap:.35rem; padding:3px; background:rgba(0,8,14,.75); border:1px solid rgba(62,224,255,.22); border-radius:.85rem; }
+.sub-btn { flex:1; min-width:0; background:rgba(6,16,24,.55); border:1px solid transparent; color:#94a3b8; font-size:.7rem; font-weight:700; padding:.38rem .4rem; border-radius:.65rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.sub-btn.active { background:linear-gradient(180deg, rgba(62,224,255,.34), rgba(62,224,255,.12)); border-color:#3EE0FF; color:#fff; box-shadow:0 0 12px rgba(62,224,255,.35); }
+.sub-btn.gold.active { background:linear-gradient(180deg, rgba(255,214,10,.38), rgba(255,149,0,.16)); border-color:#FFD60A; color:#fff; }
+.icon-btn { border-radius:.65rem; height:34px; padding:0 8px; cursor:pointer; font-size:.85rem; background:linear-gradient(180deg,#12232d,#060c10); border:1px solid rgba(62,224,255,.48); color:#e8fbff; }
+.inbox-btn.active { background:#041016 !important; border-color:#3EE0FF !important; }
+.empty { height:100%; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:12px; }
+#inbox-pane:not(.hidden), #ov-inbox-pane:not(.hidden) { display:flex; flex-direction:column; }
+#inbox-pane.hidden, #ov-inbox-pane.hidden { display:none !important; }
+.swatch { width:100%; aspect-ratio:1; border:0; padding:0; cursor:pointer; display:block; }
+.swatch.sel { box-shadow:inset 0 0 0 2px #fff; }
+.ios-sheet { background:#1c1c1e; border-radius:14px; border:1px solid rgba(255,255,255,.12); }
+.ios-seg { background:#2c2c2e; border-radius:9px; padding:2px; display:flex; }
+.ios-seg button { flex:1; border:0; background:transparent; color:#fff; font-size:13px; font-weight:600; padding:6px 0; border-radius:7px; cursor:pointer; }
+.ios-seg button.on { background:#636366; }
+.ios-op { height:28px; width:100%; appearance:none; -webkit-appearance:none; border-radius:14px; background:linear-gradient(90deg, transparent, var(--pick,#3EE0FF)), repeating-conic-gradient(#bbb 0 25%, #fff 0 50%) 0 0 / 12px 12px; }
+.ios-op::-webkit-slider-thumb { -webkit-appearance:none; width:28px; height:28px; border-radius:999px; background:var(--pick,#3EE0FF); border:3px solid #fff; }
+.preset-dot { width:28px; height:28px; border-radius:999px; border:0; cursor:pointer; }
+.rgb-row { display:flex; align-items:center; gap:8px; margin:8px 0; font-size:13px; color:#fff; }
+.rgb-row input[type=range] { flex:1; }
+.rgb-row input[type=number] { width:52px; background:#2c2c2e; border:0; color:#fff; border-radius:8px; padding:4px; text-align:center; }
+.hue-wheel { width:168px; height:168px; border-radius:999px; touch-action:none; cursor:crosshair; display:block; }
+#emoji-backdrop { position:fixed; inset:0; z-index:290; background:rgba(0,0,0,.35); }
+#emoji-sheet { position:fixed; z-index:300; width:min(360px, calc(100vw - 24px)); max-height:280px; border-radius:1rem; overflow:hidden; border:1px solid rgba(62,224,255,.4); box-shadow:0 16px 40px rgba(0,0,0,.75); background:#061018; }
+#emoji-sheet .emoji-sheet-bar { display:flex; justify-content:flex-end; padding:4px 8px; background:#061018; }
+emoji-picker { width:100%; height:240px; --background:#061018; --border-color:transparent; --input-font-color:#fff; }
+
+html.theme-onyx {
+  --highlight-color: #000000;
+  --highlight-color-rgb: 0, 0, 0;
+  --glow-color: #ffffff;
+  --liquid-glass-bg: rgba(6, 7, 10, 0.72);
+  --liquid-glass-border: rgba(255, 255, 255, 0.14);
+  --liquid-glass-specular: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(0, 0, 0, 0.5) 24%, rgba(255, 255, 255, 0.02) 55%, rgba(0, 0, 0, 0.85) 100%);
+  --liquid-rim-glow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.8), 0 8px 26px rgba(0, 0, 0, 0.9);
+}
+html.theme-onyx body {
+  background: radial-gradient(circle at 50% 15%, #121216 0%, #08080a 45%, #000000 100%) !important;
+}
+html.theme-onyx .info-cell {
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 3px 12px rgba(0, 0, 0, 0.6);
+}
+html.theme-onyx .info-cell:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(14, 14, 18, 0.8);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 3px 12px rgba(0, 0, 0, 0.6);
+}
+html.theme-onyx .glass-button {
+  background: linear-gradient(180deg, #18181c 0%, #050508 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.8);
+}
+html.theme-onyx .glass-button:not(:disabled):hover,
+html.theme-onyx .glass-button.active {
+  background: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.45);
+}
+html.theme-onyx .hud-nav-pill,
+html.theme-onyx .game-key,
+html.theme-onyx .battle-mode-btn,
+html.theme-onyx .footer-tab-button,
+html.theme-onyx .chat-expand-btn,
+html.theme-onyx .icon-btn {
+  background: linear-gradient(180deg, #18181c 0%, #060608 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+html.theme-onyx .hud-nav-pill:hover,
+html.theme-onyx .game-key:hover,
+html.theme-onyx .battle-mode-btn:hover,
+html.theme-onyx .footer-tab-button:hover,
+html.theme-onyx .chat-expand-btn:hover {
+  background: linear-gradient(180deg, #24242a 0%, #0d0d12 100%);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+html.theme-onyx .hud-nav-pill.tab-active,
+html.theme-onyx .game-key.pressed,
+html.theme-onyx .footer-tab-button.active,
+html.theme-onyx .chat-expand-btn:active,
+html.theme-onyx .inbox-btn.active,
+html.theme-onyx .sub-btn.active {
+  background: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
+}
+html.theme-onyx .sub-btn {
+  background: rgba(8,8,10,.7);
+  color: #94a3b8;
+  border-color: transparent;
+  box-shadow: none;
+}
+html.theme-onyx .sub-bar {
+  background: rgba(0,0,0,.85);
+  border-color: rgba(255,255,255,.14);
+}
+html.theme-onyx .combat-engage-btn {
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%) !important;
+  border: 1px solid #ffffff !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.45), inset 0 1px 1.5px rgba(255, 255, 255, 0.9), 0 3px 10px rgba(0, 0, 0, 0.7) !important;
+}
+html.theme-onyx .combat-engage-btn:hover {
+  background: #ffffff !important;
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.75), inset 0 1px 2px rgba(255, 255, 255, 1), 0 4px 14px rgba(0, 0, 0, 0.8) !important;
+}
+html.theme-onyx .combat-engage-btn.active {
+  background: linear-gradient(180deg, #18181c 0%, #000000 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 3px 10px rgba(0, 0, 0, 0.8) !important;
+}
+html.theme-onyx .editor-input {
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+html.theme-onyx .editor-input:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.3);
+}
+html.theme-onyx .attr-btn.glow-white,
+html.theme-onyx .attr-btn:not(:disabled) {
+  background: #000000 !important;
+  border: 1.5px solid #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(255,255,255,0.45), inset 0 0 4px rgba(255,255,255,0.2) !important;
+  animation: onyxPulseGlow 1.8s infinite alternate ease-in-out;
+}
+html.theme-onyx .attr-btn.glow-white:hover {
+  background: #111 !important;
+  box-shadow: 0 0 18px rgba(255,255,255,0.7) !important;
+}
+@keyframes onyxPulseGlow {
+  0% { box-shadow: 0 0 8px rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.55); }
+  100% { box-shadow: 0 0 16px rgba(255,255,255,0.7); border-color: #fff; }
+}
+html.theme-onyx .mini-map-panel,
+html.theme-onyx [class*="border-cyan"],
+html.theme-onyx .shadow-\[0_0_22px_rgba\(62\,224\,255\,0\.45\)\] {
+  border-color: rgba(255,255,255,0.22) !important;
+  box-shadow: none;
+}
+</style>
+</head>
+
+<body class="bg-black text-gray-100 flex flex-col items-center">
+<canvas id="smoke-canvas"></canvas>
+
+<div id="game-container" class="w-full min-h-screen min-h-[100dvh] max-w-lg mx-auto flex flex-col">
+<div id="game-hud-screen" class="relative z-10 w-full flex-1 flex flex-col">
+<div id="layout-container" class="w-full flex-1 flex flex-col p-2.5 gap-2.5 pb-28 sm:pb-16">
+
+<!-- TOP ZONE: HUD or Inline Panel -->
+<div id="hud-container" class="flex-shrink-0 relative z-30">
+<header id="hud-section" class="relative glass-panel p-2.5 flex flex-col gap-2">
+<div class="flex items-stretch justify-between gap-2">
+
+<!-- Left: Character stats -->
+<section id="player-status-panel" class="flex-1 min-w-0 pr-1 flex flex-col justify-between">
+<div class="flex flex-col space-y-0.5">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-1.5 min-w-0">
+<p class="tracking-tight truncate">
+<span class="text-white font-bold text-xs" id="player-name-display">Jeff:</span>
+<span class="text-slate-300 text-[10.5px] font-medium font-mono ml-1" id="player-level-display">Level 1</span>
+</p>
+</div>
+</div>
+
+<p class="text-xs truncate pt-0.5">
+  <span class="text-white font-bold">Experience:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono ml-1" id="top-xp-display">0</span>
+</p>
+<p class="text-xs truncate">
+  <span class="text-white font-bold">Next Level:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono ml-1" id="top-nextlvl-display">200</span>
+</p>
+<p class="text-xs truncate">
+  <span class="text-white font-bold">Race:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium ml-1" id="player-race-value">Human</span>
+</p>
+<p class="text-xs truncate">
+  <span class="text-white font-bold">A-Spec:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium ml-1" id="player-aspec-value">True Fighter · DEX</span>
+</p>
+
+<div class="pt-1 mt-0.5 border-t border-white/10 grid grid-cols-2 gap-x-2.5 gap-y-1 text-xs">
+<div class="flex items-center justify-between min-w-0">
+<div class="flex items-center gap-1 min-w-0">
+  <span class="text-white font-bold">Dex:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono" id="core-stat-dex">20</span>
+</div>
+<button class="attr-btn flex-shrink-0" onclick="window.spendPoint('DEX')">+</button>
+</div>
+<div class="flex items-center justify-between min-w-0">
+<div class="flex items-center gap-1 min-w-0">
+  <span class="text-white font-bold">Str:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono" id="core-stat-str">15</span>
+</div>
+<button class="attr-btn flex-shrink-0" onclick="window.spendPoint('STR')">+</button>
+</div>
+<div class="flex items-center justify-between min-w-0">
+<div class="flex items-center gap-1 min-w-0">
+  <span class="text-white font-bold">Wis:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono" id="core-stat-wis">5</span>
+</div>
+<button class="attr-btn flex-shrink-0" onclick="window.spendPoint('WIS')">+</button>
+</div>
+<div class="flex items-center justify-between min-w-0">
+<div class="flex items-center gap-1 min-w-0">
+  <span class="text-white font-bold">Ntl:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono" id="core-stat-ntl">5</span>
+</div>
+<button class="attr-btn flex-shrink-0" onclick="window.spendPoint('NTL')">+</button>
+</div>
+<div class="flex items-center justify-between min-w-0">
+<div class="flex items-center gap-1 min-w-0">
+  <span class="text-white font-bold">Vit:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono" id="core-stat-vit">10</span>
+</div>
+<button class="attr-btn flex-shrink-0" onclick="window.spendPoint('VIT')">+</button>
+</div>
+<div class="flex items-center justify-start min-w-0 text-xs truncate" id="core-free-levels-display">
+<span class="text-white font-bold mr-1">Lvls:</span>
+<span class="text-slate-300 text-[10.5px] font-medium font-mono">0 (0 AP)</span>
+</div>
+</div>
+
+<div class="pt-1 mt-0.5 border-t border-white/10 flex flex-col gap-0.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-white font-bold">Health:</span>
+<span id="combat-hp-display" class="font-mono font-bold text-[10.5px]" style="color:#30D158;">200 / 200</span>
+</div>
+<div class="w-full bg-black/80 rounded-full h-1.5 overflow-hidden relative border border-white/10">
+<div id="combat-hp-bar" class="h-full rounded-full transition-all duration-300 ease-out" style="width: 100%; background: #30D158; box-shadow: 0 0 10px rgba(48,209,88,0.6);"></div>
+</div>
+</div>
+
+<!-- Battle Mode Toggle -->
+<div class="pt-1.5 mt-1 border-t border-white/10 flex flex-col items-center gap-1">
+<button id="battle-mode-toggle-btn" onclick="window.toggleBattleMode()" class="battle-mode-btn w-full flex items-center justify-center cursor-pointer" title="Toggle simplified Battle Mode view">
+<span id="battle-mode-label">Battle Mode</span>
+</button>
+<p id="battle-mode-desc" class="text-[9.5px] leading-tight text-center text-slate-400">
+Streamlines HUD to stats, combat console, and transmissions for fast combat.
+</p>
+</div>
+
+</div>
+</section>
+
+<section id="hud-nav-deck" class="w-[172px] sm:w-[184px] flex-shrink-0 flex flex-col items-center justify-between pl-1.5 border-l border-white/10">
+<div class="w-full text-center px-0.5 pt-0.5">
+<p class="text-xs leading-tight truncate">
+  <span class="text-white font-bold">Zone:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium ml-1" id="zone-name-value">Aether Silver Cavern</span>
+</p>
+<p class="text-xs leading-tight truncate mt-0.5">
+  <span class="text-white font-bold">Cords:</span>
+  <span class="text-slate-300 text-[10.5px] font-medium font-mono ml-1" id="player-coords-value">[7, 7]</span>
+</p>
+</div>
+
+<div id="mini-map-panel" class="cursor-pointer my-1 flex items-center justify-center transition-transform hover:scale-105 active:scale-95" title="Tap to open World Map">
+<div id="mini-map-container" class="w-[80px] h-[80px] relative flex items-center justify-center">
+<div class="absolute -inset-1 rounded-full border border-dashed border-cyan-300/60 animate-spin" style="animation-duration: 20s; animation-timing-function: linear;"></div>
+<div class="relative w-full h-full rounded-full overflow-hidden glass-panel border-2 border-cyan-300/55 shadow-[0_0_22px_rgba(62,224,255,0.45)]">
+<canvas id="mini-map-canvas" class="w-full h-full block"></canvas>
+</div>
+</div>
+</div>
+
+<div class="d-pad-controls mt-1 mb-0.5">
+<div class="game-key move-key" data-key="up" title="Move Up"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg></div>
+<div class="game-key move-key" data-key="left" title="Move Left"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg></div>
+<div class="game-key move-key key-enter-btn" data-key="enter" title="Enter">Enter</div>
+<div class="game-key move-key" data-key="right" title="Move Right"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></div>
+<div class="game-key move-key" data-key="down" title="Move Down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg></div>
+</div>
+</section>
+</div>
+
+<!-- Treasury Ledger -->
+<div class="pt-1.5 border-t border-white/10 grid grid-cols-2 gap-2">
+<div class="info-cell px-2.5 py-1.5 flex items-center justify-between min-w-0" title="Gold on hand">
+<span style="color:#FFD60A;" class="font-bold text-[11px] flex-shrink-0">Gold:</span>
+<span style="color:#FFD60A;" class="font-mono font-bold text-xs truncate ml-1 text-right" id="top-gold-display">1.2K</span>
+</div>
+<div class="info-cell px-2.5 py-1.5 flex items-center justify-between min-w-0" title="Bank Vault balance">
+<span style="color:#FFD60A;" class="font-bold text-[11px] flex-shrink-0">Bank:</span>
+<span style="color:#FFD60A;" class="font-mono font-bold text-xs truncate ml-1 text-right" id="top-bank-display">10.0K</span>
+</div>
+</div>
+
+<!-- Tab Selector Row -->
+<div id="hud-tabs-row" class="pt-1 border-t border-white/10 flex flex-col gap-1.5">
+<div class="flex items-center gap-1.5">
+<button id="nav-btn-stats" class="hud-nav-pill flex-1 text-center">Player Info</button>
+<button id="nav-btn-training" class="hud-nav-pill flex-1 text-center">Training Log</button>
+<button id="nav-btn-settings" class="hud-nav-pill flex-1 text-center">Settings</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button id="nav-btn-equipment" class="hud-nav-pill flex-1 text-center">Equipment</button>
+<button id="nav-btn-inventory" class="hud-nav-pill flex-1 text-center">Inventory</button>
+</div>
+</div>
+</header>
+
+<div id="inline-panel" class="glass-panel p-2.5 gap-0">
+<div class="flex items-center justify-between mb-2 flex-shrink-0">
+<div class="flex flex-col gap-1 flex-1 min-w-0">
+<div class="flex gap-1">
+<button data-panel="stats" class="panel-tab-pill hud-nav-pill !text-[10px] !py-0.5 !px-2 flex-1 text-center">Player Info</button>
+<button data-panel="training" class="panel-tab-pill hud-nav-pill !text-[10px] !py-0.5 !px-2 flex-1 text-center">Training Log</button>
+<button data-panel="settings" class="panel-tab-pill hud-nav-pill !text-[10px] !py-0.5 !px-2 flex-1 text-center">Settings</button>
+</div>
+<div class="flex gap-1">
+<button data-panel="equipment" class="panel-tab-pill hud-nav-pill flex-1 !text-[10px] !py-0.5 text-center">Equipment</button>
+<button data-panel="inventory" class="panel-tab-pill hud-nav-pill flex-1 !text-[10px] !py-0.5 text-center">Inventory</button>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-2 flex-shrink-0">
+<button id="panel-pin-btn" class="pin-btn" title="Pin panel open">📌</button>
+<button id="panel-close-btn" class="w-7 h-7 rounded-full flex items-center justify-center bg-black border border-white/20 text-zinc-300 hover:text-white hover:border-white text-lg leading-none transition-all" title="Close panel">×</button>
+</div>
+</div>
+<div id="inline-panel-body" class="flex-1 overflow-y-auto" style="max-height: 480px;">
+<div id="panel-content-equipment" class="panel-content"></div>
+<div id="panel-content-inventory" class="panel-content hidden"></div>
+<div id="panel-content-stats" class="panel-content hidden"></div>
+<div id="panel-content-training" class="panel-content hidden"></div>
+<div id="panel-content-settings" class="panel-content hidden"></div>
+</div>
+</div>
+</div>
+
+<section id="combat-console-card" class="flex-shrink-0 glass-panel p-2.5 flex flex-col gap-1.5 relative z-20 shadow-2xl">
+<div id="combat-fx-layer" class="absolute inset-0 pointer-events-none overflow-visible"></div>
+
+<div class="flex items-center justify-between text-[9.5px] px-0.5 gap-1.5">
+<div class="flex items-center gap-0.5 min-w-0 flex-1">
+<span class="text-white font-semibold flex-shrink-0">Last Item:</span>
+<span id="combat-lastitem-display" class="font-bold truncate" style="color:#8FA8C7;">None</span>
+<span id="combat-inv-count-display" class="font-mono font-bold text-[9px] ml-0.5 flex-shrink-0" style="color:#30D158;">13/200</span>
+</div>
+<div class="flex items-center justify-end gap-0.5 min-w-0 flex-1">
+<span class="text-white font-semibold flex-shrink-0">Last Gem:</span>
+<span id="combat-lastgem-display" class="font-bold truncate" style="color:#8FA8C7;">None</span>
+<span id="combat-gem-count-display" class="font-mono font-bold text-[9px] ml-0.5 flex-shrink-0" style="color:#30D158;">7/200</span>
+</div>
+</div>
+
+<div class="flex gap-2 items-center">
+<div class="relative flex-shrink-0">
+<select id="targetTypeSelect" class="appearance-none pl-2.5 pr-6 py-1.5 rounded-xl bg-black/90 border border-white/20 text-xs font-semibold text-white cursor-pointer focus:outline-none focus:border-white transition-colors">
+<option value="monsters" class="bg-[#0b1019] text-white">Monsters</option>
+<option value="players" class="bg-[#0b1019] text-white">Players</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-1.5 flex items-center text-zinc-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+</div>
+</div>
+
+<div class="relative flex-grow min-w-0">
+<select id="monsterSelect" class="editor-input flex-grow !py-1.5 !pr-7 !text-xs bg-black/90 border-white/20 appearance-none"></select>
+<div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+</div>
+</div>
+
+<button class="combat-engage-btn" id="fightBtn">BATTLE</button>
+</div>
+
+<div id="combat-action-row" class="standby">
+<button id="combat-cast-btn" class="combat-tactile-btn combat-cast-slab"><span>⚡</span><span>CAST</span></button>
+<button id="combat-fight-btn" class="combat-tactile-btn combat-fight-slab"><span>⚔</span><span>FIGHT</span></button>
+</div>
+
+<div id="combat-ticker-log" class="flex flex-col justify-center items-center text-center px-2 py-0.5 bg-black/60 rounded-lg border border-white/10 overflow-hidden h-[46px] min-h-[46px] max-h-[46px] flex-shrink-0">
+<div id="combat-log-line-1" class="text-[10px] leading-tight font-medium text-slate-300 truncate w-full"></div>
+<div id="combat-log-line-2" class="text-[10.5px] leading-tight font-bold text-white truncate w-full">Select target & press BATTLE to fight</div>
+<div id="combat-log-line-3" class="text-[10.5px] leading-tight font-extrabold text-amber-400 truncate w-full"></div>
+</div>
+</section>
+
+<div id="footer-container" class="flex-1 flex flex-col min-h-[240px] sm:min-h-[280px]">
+<footer class="flex-1 flex items-stretch gap-2 min-h-0 h-full">
+<section class="w-full flex-1 flex-col min-h-0 h-full flex">
+<div class="glass-panel w-full p-2.5 flex flex-col h-full min-h-0 shadow-lg">
+<div class="flex-shrink-0 flex items-center justify-between gap-1.5 mb-2">
+<div class="flex items-center gap-1.5 flex-1 min-w-0">
+<button type="button" id="inbox-btn" class="chat-expand-btn inbox-btn" title="Private Messages">💬</button>
+<button data-channel="main" class="footer-tab-button flex-1 active">Main</button>
+<button data-channel="sales" class="footer-tab-button flex-1">Sales</button>
+<button data-channel="clan" class="footer-tab-button flex-1">Clan</button>
+<button data-channel="groups" class="footer-tab-button flex-1">Groups</button>
+</div>
+<button id="expand-chat-btn" class="chat-expand-btn ml-1" title="Maximize Transmission Console">
+<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<polyline points="15 3 21 3 21 9"></polyline>
+<polyline points="9 21 3 21 3 15"></polyline>
+<line x1="21" y1="3" x2="14" y2="10"></line>
+<line x1="3" y1="21" x2="10" y2="14"></line>
+</svg>
+</button>
+</div>
+<div id="chat-subs" class="sub-bar flex-shrink-0 mb-2"></div>
+<div id="group-hint" class="hidden flex-shrink-0 text-[12px] text-white text-center font-medium tracking-wide px-3 py-1.5 mb-2 rounded-lg border border-cyan-400/35 bg-black/35">Hold a group tab to rename it</div>
+<div id="footer-chat-content-wrapper" class="text-xs space-y-1.5 overflow-y-auto custom-scrollbar flex-1 min-h-[140px] p-1"></div>
+<div id="inbox-pane" class="hidden flex-1 min-h-0 flex-col">
+  <div class="flex-1 min-h-0 flex flex-col border border-cyan-400/30 rounded-xl mb-2 overflow-hidden bg-black/30">
+    <div class="px-3 py-2 text-[13px] font-semibold border-b border-cyan-400/25">💬 Private Messages:</div>
+    <div class="flex-1 overflow-y-auto px-3 py-2 text-[12px] text-slate-400">No private messages</div>
+  </div>
+  <div class="flex-1 min-h-0 flex flex-col border border-cyan-400/30 rounded-xl overflow-hidden bg-black/30">
+    <div class="px-3 py-2 text-[13px] font-semibold border-b border-cyan-400/25">🤖 Discord Messages:</div>
+    <div class="flex-1 overflow-y-auto px-3 py-2 text-[12px] text-slate-400">Link a Discord account to message players from in-game</div>
+  </div>
+</div>
+<form id="footer-message-form" class="flex-shrink-0 flex items-center gap-1.5 mt-2 pt-1 border-t border-white/10">
+<button type="button" id="emoji-btn" class="icon-btn emoji-btn" title="Emoji">😀</button>
+<input type="text" id="footer-message-input" class="editor-input !py-2 !text-xs flex-grow" placeholder="Type To Chat…" autocomplete="off">
+<button type="submit" class="footer-tab-button !px-4 !py-2 font-semibold">Send</button>
+</form>
+</div>
+</section>
+</footer>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="item-action-modal-backdrop" class="fixed inset-0 bg-black/80 z-[998] hidden backdrop-blur-md"></div>
+<div id="item-action-modal-content" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[999] w-[90%] max-w-xs glass-panel p-5 rounded-2xl hidden border-white/20">
+<div id="item-action-modal-body" class="text-center"></div>
+</div>
+
+<div id="confirm-modal-backdrop" class="fixed inset-0 bg-black/85 z-[1000] hidden backdrop-blur-md flex items-center justify-center p-4">
+<div class="glass-panel p-5 max-w-xs w-full text-center space-y-3 rounded-2xl border-red-500/40">
+<div class="text-2xl">⚠️</div>
+<h3 id="confirm-modal-title" class="font-orbitron font-bold text-white text-sm">Confirm Action</h3>
+<p id="confirm-modal-msg" class="text-xs text-zinc-300">Are you sure you want to proceed?</p>
+<div class="flex gap-2 pt-2">
+<button id="confirm-modal-cancel" class="glass-button flex-1 py-1.5 text-xs text-zinc-400">Cancel</button>
+<button id="confirm-modal-ok" class="glass-button flex-1 py-1.5 text-xs !bg-red-950/70 !border-red-500/60 text-red-300">Confirm</button>
+</div>
+</div>
+</div>
+
+<div id="full-screen-map-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 hidden flex-col items-center justify-between p-4">
+<h3 class="font-orbitron text-xl text-white mt-2">World Exploration</h3>
+<div class="w-full flex-grow flex items-center justify-center my-3">
+<div id="zone-canvas-container" class="w-full h-full max-w-md max-h-[400px] aspect-square bg-black rounded-2xl border-2 border-white/25 relative overflow-hidden glass-panel">
+<canvas id="zone-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+</div>
+</div>
+<div class="flex flex-col items-center mb-2">
+<div class="d-pad-controls" id="map-d-pad">
+<div class="game-key move-key" data-key="up"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg></div>
+<div class="game-key move-key" data-key="left"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg></div>
+<div class="game-key move-key key-enter-btn" data-key="enter">Enter</div>
+<div class="game-key move-key" data-key="right"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></div>
+<div class="game-key move-key" data-key="down"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg></div>
+</div>
+</div>
+<button id="map-close-btn" class="absolute top-4 right-5 text-2xl text-gray-400 hover:text-white">×</button>
+</div>
+
+<div id="full-screen-chat-overlay" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[150] hidden flex-col justify-between p-3.5 sm:p-5">
+<div class="glass-panel w-full max-w-lg mx-auto h-full flex flex-col p-3 shadow-2xl relative border-white/20">
+<div class="flex items-center gap-1.5 mb-2 flex-shrink-0">
+<button type="button" id="ov-inbox-btn" class="chat-expand-btn inbox-btn" title="Private Messages">💬</button>
+<button data-channel="main" class="overlay-tab-button footer-tab-button flex-1 active">Main</button>
+<button data-channel="sales" class="overlay-tab-button footer-tab-button flex-1">Sales</button>
+<button data-channel="clan" class="overlay-tab-button footer-tab-button flex-1">Clan</button>
+<button data-channel="groups" class="overlay-tab-button footer-tab-button flex-1">Groups</button>
+<button id="chat-overlay-close-btn" class="chat-expand-btn">✕</button>
+</div>
+<div id="ov-chat-subs" class="sub-bar flex-shrink-0 mb-2"></div>
+<div id="ov-group-hint" class="hidden flex-shrink-0 text-[12px] text-white text-center font-medium tracking-wide px-3 py-1.5 mb-2 rounded-lg border border-cyan-400/35 bg-black/35">Hold a group tab to rename it</div>
+<div id="fullscreen-chat-content-wrapper" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2 text-xs"></div>
+<div id="ov-inbox-pane" class="hidden flex-1 min-h-0 flex-col">
+  <div class="flex-1 min-h-0 flex flex-col border border-cyan-400/30 rounded-xl mb-2 overflow-hidden bg-black/30">
+    <div class="px-3 py-2 text-[13px] font-semibold border-b border-cyan-400/25">💬 Private Messages:</div>
+    <div class="flex-1 overflow-y-auto px-3 py-2 text-[12px] text-slate-400">No private messages</div>
+  </div>
+  <div class="flex-1 min-h-0 flex flex-col border border-cyan-400/30 rounded-xl overflow-hidden bg-black/30">
+    <div class="px-3 py-2 text-[13px] font-semibold border-b border-cyan-400/25">🤖 Discord Messages:</div>
+    <div class="flex-1 overflow-y-auto px-3 py-2 text-[12px] text-slate-400">Link a Discord account to message players from in-game</div>
+  </div>
+</div>
+<form id="overlay-message-form" class="flex items-center gap-1.5 pt-2 border-t border-white/10 flex-shrink-0">
+<button type="button" id="ov-emoji-btn" class="icon-btn emoji-btn" title="Emoji">😀</button>
+<input type="text" id="overlay-message-input" class="editor-input !py-2.5 !text-xs flex-grow" placeholder="Type To Chat…">
+<button type="submit" class="footer-tab-button !px-5 !py-2.5 font-semibold">Send</button>
+</form>
+</div>
+</div>
+<div id="rename-modal" class="hidden fixed inset-0 bg-black/80 z-[180] items-center justify-center p-4">
+  <div class="glass-panel w-full max-w-xs p-4 relative">
+    <div class="relative z-10">
+      <h3 class="text-xs font-bold uppercase tracking-wider mb-2">Rename Group</h3>
+      <input id="rename-input" maxlength="18" class="editor-input !py-2 !text-xs mb-3" placeholder="Group name">
+      <div class="flex justify-end gap-2">
+        <button type="button" id="rename-cancel" class="footer-tab-button !px-3">Cancel</button>
+        <button type="button" id="rename-save" class="footer-tab-button active !px-4">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-notification"></div>
+
+<script type="module">
+const ColorSystem = {
+  progression: '#ffffff', currency: '#FFD60A', fighter: '#FF375F', caster: '#0A84FF', vitality: '#30D158',
+  status: { green: '#30D158', yellow: '#FFD60A', red: '#FF375F' },
+  rarity: { Common: '#D1D5DB', Uncommon: '#30D158', Rare: '#0A84FF', Epic: '#BF5AF2', Legendary: '#FF9F0A', Mythic: '#FF375F', None: '#8FA8C7' },
+  getHealthColor(c, m) { if (!m || m <= 0) return this.status.green; const r = (c / m) * 100; return r > 50 ? this.status.green : r > 25 ? this.status.yellow : this.status.red; },
+  getInventoryColor(c, m = 200) { if (!m || m <= 0) return this.status.green; const r = (c / m) * 100; return r <= 50 ? this.status.green : r <= 80 ? this.status.yellow : this.status.red; },
+  getRarityColor(r) { return this.rarity[r] || this.rarity.None; }
+};
+window.ColorSystem = ColorSystem;
+
+function getItemVectorIcon(subType, type) {
+  const s = (subType || type || '').toLowerCase();
+  if (s.includes('helmet') || s.includes('helm')) {
+    return `<svg class="w-7 h-7 text-zinc-200 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a8 8 0 00-8 8v4a4 4 0 004 4h8a4 4 0 004-4v-4a8 8 0 00-8-8z"/><path d="M9 12h6M12 2v10M8 15h8"/></svg>`;
+  }
+  if (s.includes('sword') || s.includes('blade')) {
+    return `<svg class="w-7 h-7 text-rose-400 drop-shadow-[0_0_8px_rgba(255,55,95,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4l5.5 5.5L7 22l-4-1 1-4L14.5 4z"/><path d="M18 7.5l-3.5-3.5M4 20l3.5-3.5"/></svg>`;
+  }
+  if (s.includes('axe')) {
+    return `<svg class="w-7 h-7 text-amber-400 drop-shadow-[0_0_8px_rgba(255,149,0,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 12l6-6-4-4-6 6M4 20l10-10M9 7l4 4"/></svg>`;
+  }
+  if (s.includes('staff')) {
+    return `<svg class="w-7 h-7 text-sky-400 drop-shadow-[0_0_8px_rgba(10,132,255,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19L19 5M17 3l4 4M19 7l-2-2M12 12l2 2"/></svg>`;
+  }
+  if (s.includes('cuirass') || s.includes('armor')) {
+    return `<svg class="w-7 h-7 text-emerald-400 drop-shadow-[0_0_8px_rgba(48,209,88,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3L4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7l-8-4z"/><path d="M12 3v19"/></svg>`;
+  }
+  if (s.includes('gauntlet') || s.includes('glove')) {
+    return `<svg class="w-7 h-7 text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="8" width="12" height="12" rx="3"/><path d="M9 4v4M12 3v5M15 4v4"/></svg>`;
+  }
+  if (s.includes('legging')) {
+    return `<svg class="w-7 h-7 text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v4l-2 13-3-1-1-9-1 9-3 1L6 7V3z"/></svg>`;
+  }
+  if (s.includes('boot')) {
+    return `<svg class="w-7 h-7 text-zinc-300 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h6v9l5 2v4H5v-4l2-2V4z"/></svg>`;
+  }
+  if (s.includes('fire')) {
+    return `<svg class="w-7 h-7 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2c1 3.5 4 5 4 8.5 0 3-2 5.5-4 7.5-2-2-4-4.5-4-7.5 0-3.5 3-5 4-8.5z"/></svg>`;
+  }
+  if (s.includes('air') || s.includes('zephyr')) {
+    return `<svg class="w-7 h-7 text-sky-300 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h13a3 3 0 10-3-3M3 12h14a3 3 0 11-3 3M6 16h8a2 2 0 10-2-2"/></svg>`;
+  }
+  if (s.includes('death') || s.includes('void')) {
+    return `<svg class="w-7 h-7 text-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a9 9 0 00-9 9c0 4 2.5 7 6 8.5V22h6v-2.5c3.5-1.5 6-4.5 6-8.5a9 9 0 00-9-9z"/><circle cx="9" cy="11" r="1"/><circle cx="15" cy="11" r="1"/></svg>`;
+  }
+  if (s.includes('rune') || s.includes('accessory')) {
+    return `<svg class="w-7 h-7 text-zinc-200 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="2" x2="12" y2="22"/></svg>`;
+  }
+  if (s.includes('amulet') || s.includes('pendant')) {
+    return `<svg class="w-7 h-7 text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3l6 9 6-9"/><circle cx="12" cy="16" r="4"/><path d="M12 14v4M10 16h4"/></svg>`;
+  }
+  if (s.includes('ring')) {
+    return `<svg class="w-7 h-7 text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><polygon points="12 3 14 6 10 6 12 3"/></svg>`;
+  }
+  return `<svg class="w-7 h-7 text-zinc-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+
+const races = {
+  "human": { "raceName": "Human", "archetype": "True Fighter", "primaryStat": "DEX", "apAllocationWeights": { "STR": 15, "DEX": 20, "VIT": 10, "NTL": 5, "WIS": 5 } },
+  "dragonborn": { "raceName": "Dragonborn", "archetype": "True Fighter", "primaryStat": "DEX", "apAllocationWeights": { "STR": 18, "DEX": 20, "VIT": 12, "NTL": 2, "WIS": 3 } },
+  "orc": { "raceName": "Orc", "archetype": "True Fighter", "primaryStat": "DEX", "apAllocationWeights": { "STR": 20, "DEX": 18, "VIT": 15, "NTL": 2, "WIS": 2 } },
+  "phoenix": { "raceName": "Phoenix", "archetype": "True Caster", "primaryStat": "WIS", "apAllocationWeights": { "STR": 2, "DEX": 3, "VIT": 10, "NTL": 20, "WIS": 20 } },
+  "elf": { "raceName": "Elf", "archetype": "True Caster", "primaryStat": "WIS", "apAllocationWeights": { "STR": 2, "DEX": 7, "VIT": 7, "NTL": 20, "WIS": 19 } },
+  "angel": { "raceName": "Angel", "archetype": "Hybrid", "primaryStat": "DEX", "apAllocationWeights": { "STR": 12, "DEX": 18, "VIT": 8, "NTL": 8, "WIS": 9 } }
+};
+
+const progression = {
+  "dropperTiers": [
+    { "tier": 1, "minLevelReq": 1, "goldCostPerPiece": 50000, "classValue": 13.00 },
+    { "tier": 2, "minLevelReq": 1, "goldCostPerPiece": 87500, "classValue": 15.86 },
+    { "tier": 3, "minLevelReq": 100, "goldCostPerPiece": 153125, "classValue": 19.35 }
+  ],
+  "dropperSlotModifiers": {
+    "Weapon": { "statProportionality": 1.0, "statType": "WC" }, "Spell": { "statProportionality": 1.0, "statType": "SC" },
+    "Armor": { "statProportionality": 1.0, "statType": "AC" }, "Helmet": { "statProportionality": 0.75, "statType": "AC" },
+    "Boots": { "statProportionality": 0.75, "statType": "AC" }, "Leggings": { "statProportionality": 0.50, "statType": "AC" },
+    "Gauntlets": { "statProportionality": 0.50, "statType": "AC" }
+  }
+};
+
+const bestiary = {
+  "Z01": {
+    "zoneId": "Z01", "zoneName": "Aether Silver Cavern", "minLevel": 1,
+    "monsters": [
+      { "id": "E01", "name": "Glass Construct", "hp": 25, "atk": 10, "def": 13, "xp": 18, "gold": 8, "drop": { "name": "Glass Construct Core", "rarity": "Common" } },
+      { "id": "E02", "name": "Mercury Sprite", "hp": 32, "atk": 12, "def": 15, "xp": 24, "gold": 12, "drop": { "name": "Mercury Essence", "rarity": "Uncommon" } },
+      { "id": "E03", "name": "Mirror Gargoyle", "hp": 45, "atk": 15, "def": 18, "xp": 36, "gold": 20, "drop": { "name": "Polished Mirror Shard", "rarity": "Rare" } },
+      { "id": "E04*", "name": "Prism Titan", "hp": 75, "atk": 22, "def": 25, "xp": 120, "gold": 75, "drop": { "name": "Titan's Prism Heart", "rarity": "Epic" } }
+    ]
+  }
+};
+
+const items = {
+  baseItemTemplates: [
+    { id: 'base_helm_1', name: 'Silver Crest Helm', type: 'Armor', subType: 'Helmet', sockets: 2 },
+    { id: 'base_armor_1', name: 'Chroma Glass Cuirass', type: 'Armor', subType: 'Armor', sockets: 2 },
+    { id: 'base_gauntlets_1', name: 'Platinum Gauntlets', type: 'Armor', subType: 'Gauntlets', sockets: 2 },
+    { id: 'base_leggings_1', name: 'Obsidian Weave Leggings', type: 'Armor', subType: 'Leggings', sockets: 2 },
+    { id: 'base_boots_1', name: 'Liquid Glass Boots', type: 'Armor', subType: 'Boots', sockets: 2 },
+    { id: 'base_sword_1', name: 'Quicksilver Blade', type: 'Weapons', subType: 'Sword', sockets: 2 },
+    { id: 'base_axe_1', name: 'Brutal War Axe', type: 'Weapons', subType: 'Axe', sockets: 2 },
+    { id: 'base_staff_1', name: 'Monochrome Siphon', type: 'Weapons', subType: 'Staff', sockets: 2 },
+    { id: 'base_firespell_1', name: 'Pyroclastic Surge', type: 'Spells', subType: 'Fire', sockets: 2 },
+    { id: 'base_airspell_1', name: 'Zephyr Vortex', type: 'Spells', subType: 'Air', sockets: 2 },
+    { id: 'base_deathspell_1', name: 'Void Reaping', type: 'Spells', subType: 'Death', sockets: 2 },
+    { id: 'base_accessory_1', name: 'Aether Rune Matrix', type: 'Accessory', subType: 'Rune', sockets: 2 },
+    { id: 'base_amulet_1', name: 'Platinum Pendant', type: 'Amulet', subType: 'Amulet', sockets: 2 },
+    { id: 'base_ring_1', name: 'Polished Silver Ring', type: 'Ring', subType: 'Ring', sockets: 2 }
+  ]
+};
+
+const gems = {
+  "standard": {
+    "warStone": { "id": "warStone", "name": "WarStone", "category": "Fighter", "color": "Red", "effect": "Increase Base Weapon Class" },
+    "mightrite": { "id": "mightrite", "name": "Mightrite", "category": "Fighter", "color": "Red", "effect": "Increase Dexterity" },
+    "mightStone": { "id": "mightStone", "name": "MightStone", "category": "Fighter", "color": "Red", "effect": "Increase Strength" },
+    "loreStone": { "id": "loreStone", "name": "LoreStone", "category": "Caster", "color": "Blue", "effect": "Increase Base Spell Class" },
+    "mindrite": { "id": "mindrite", "name": "Mindrite", "category": "Caster", "color": "Blue", "effect": "Increase Wisdom" },
+    "mindStone": { "id": "mindStone", "name": "MindStone", "category": "Caster", "color": "Blue", "effect": "Increase Intelligence" },
+    "obsidianHeart": { "id": "obsidianHeart", "name": "Obsidian Heart", "category": "Misc", "color": "Green", "effect": "Increase Base Armor Class" },
+    "spikeCore": { "id": "spikeCore", "name": "Spike-Core", "category": "Misc", "color": "Yellow", "effect": "Increase Critical Hit Chance" },
+    "trueCore": { "id": "trueCore", "name": "True-Core", "category": "Misc", "color": "Green", "effect": "Increase Hit Chance" },
+    "vitalCore": { "id": "vitalCore", "name": "Vital-Core", "category": "Misc", "color": "Green", "effect": "Increase Vitality" },
+    "treasureCore": { "id": "treasureCore", "name": "Treasure-Core", "category": "Misc", "color": "Yellow", "effect": "Increase Drop Chance" }
+  }
+};
+
+const equipmentSlotConfig = [
+  { name: 'Helmet', type: 'Armor', subType: 'Helmet' },
+  { name: 'Weapon 1', type: 'Weapons', subType: 'Weapon' },
+  { name: 'Gloves', type: 'Armor', subType: 'Gauntlets' },
+  { name: 'Weapon 2', type: 'Weapons', subType: 'Weapon' },
+  { name: 'Armor', type: 'Armor', subType: 'Armor' },
+  { name: 'Spell 1', type: 'Spells', subType: 'Spell' },
+  { name: 'Leggings', type: 'Armor', subType: 'Leggings' },
+  { name: 'Spell 2', type: 'Spells', subType: 'Spell' },
+  { name: 'Boots', type: 'Armor', subType: 'Boots' },
+  { name: 'Accessory', type: 'Accessory', subType: 'Rune' },
+  { name: 'Amulet', type: 'Amulet', subType: 'Amulet' },
+  { name: 'Ring', type: 'Ring', subType: 'Ring' }
+];
+
+const gddConstants = {
+  XP_BASE: 200,
+  XP_GROWTH_RATE: 1.12,
+  AP_PER_LEVEL: 40,
+  PLAYER_DAMAGE_CONSTANT: 90,
+  MONSTER_DAMAGE_AC_REDUCTION_FACTOR: 0.5
+};
+
+function formatCompactNumber(num) {
+  if (num === null || num === undefined || isNaN(num)) return '0';
+  const abs = Math.abs(num);
+  if (abs >= 1e18) return (num / 1e18).toFixed(2) + 'Quint';
+  if (abs >= 1e15) return (num / 1e15).toFixed(2) + 'Quad';
+  if (abs >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+  if (abs >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (abs >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (abs >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+  return Math.floor(num).toLocaleString();
+}
+
+let state = {
+  player: null,
+  game: {
+    combatActive: false,
+    currentZoneId: 'Z01',
+    lastDrop: { name: 'None', rarity: 'None' },
+    lastItem: { name: 'None', rarity: 'None' },
+    lastGem: { name: 'None', rarity: 'None' }
+  },
+  zone: { name: "Aether Silver Cavern" },
+  chat: {
+    currentChannel: 'main',
+    sub: { main: 'feed', sales: 'chat', clan: 'chat', groups: 'g1' },
+    inboxOpen: false,
+    nameColor: localStorage.getItem('g_name') || '#3EE0FF',
+    groups: JSON.parse(localStorage.getItem('g_groups') || '{"g1":"Group-1","g2":"Group-2","g3":"Group-3","g4":"Group-4"}'),
+    messages: { main: [], sales: [], clan: [], groups: [], g1: [], g2: [], g3: [], g4: [] }
+  },
+  battleStats: { levels: 0, kills: 0, rounds: 0, deaths: 0, oneHitKills: 0 },
+  battleMode: false
+};
+window.gameState = state;
+
+function createDefaultPlayer(name = 'Jeff', raceKey = 'human') {
+  const raceData = races[raceKey] || races.human;
+  const p = {
+    name, level: 1, xp: 0, gold: 1200, bank: 10000, _bankGrant10k: true,
+    xpToNextLevel: gddConstants.XP_BASE, attributePoints: gddConstants.AP_PER_LEVEL,
+    race: raceKey, archetype: raceData.archetype, cci: raceData.primaryStat,
+    baseStats: { ...raceData.apAllocationWeights }, derivedStats: {},
+    inventory: [], equipment: {}, gems: [], pos: { x: 7, y: 7 }
+  };
+  const starterItems = [
+    { baseId: 'base_sword_1', tier: 1, socketGems: [{ id: 'warStone', grade: 1 }] },
+    { baseId: 'base_axe_1', tier: 1, socketGems: [] },
+    { baseId: 'base_staff_1', tier: 1, socketGems: [{ id: 'loreStone', grade: 1 }] },
+    { baseId: 'base_armor_1', tier: 1, socketGems: [{ id: 'obsidianHeart', grade: 1 }] },
+    { baseId: 'base_helm_1', tier: 1, socketGems: [] },
+    { baseId: 'base_gauntlets_1', tier: 1, socketGems: [{ id: 'mightrite', grade: 1 }] },
+    { baseId: 'base_leggings_1', tier: 1, socketGems: [] },
+    { baseId: 'base_boots_1', tier: 1, socketGems: [] },
+    { baseId: 'base_firespell_1', tier: 1, socketGems: [{ id: 'loreStone', grade: 1 }] },
+    { baseId: 'base_airspell_1', tier: 1, socketGems: [] },
+    { baseId: 'base_amulet_1', tier: 1, socketGems: [{ id: 'vitalCore', grade: 1 }] },
+    { baseId: 'base_ring_1', tier: 1, socketGems: [] },
+    { baseId: 'base_accessory_1', tier: 1, socketGems: [{ id: 'trueCore', grade: 1 }] }
+  ];
+  starterItems.forEach((itemDef, idx) => {
+    const base = items.baseItemTemplates.find(b => b.id === itemDef.baseId);
+    if (!base) return;
+    const inst = {
+      instanceId: `item_${Date.now()}_${idx}`,
+      baseItemId: base.id,
+      tier: itemDef.tier,
+      type: 'Dropper',
+      socketedGems: itemDef.socketGems
+    };
+    p.inventory.push(inst);
+    if (base.subType === 'Sword' && !p.equipment['Weapon 1']) p.equipment['Weapon 1'] = inst.instanceId;
+    else if (base.subType === 'Armor' && !p.equipment['Armor']) p.equipment['Armor'] = inst.instanceId;
+    else if (base.subType === 'Helmet' && !p.equipment['Helmet']) p.equipment['Helmet'] = inst.instanceId;
+    else if (base.subType === 'Gauntlets' && !p.equipment['Gloves']) p.equipment['Gloves'] = inst.instanceId;
+    else if (base.subType === 'Leggings' && !p.equipment['Leggings']) p.equipment['Leggings'] = inst.instanceId;
+    else if (base.subType === 'Boots' && !p.equipment['Boots']) p.equipment['Boots'] = inst.instanceId;
+    else if (base.subType === 'Fire' && !p.equipment['Spell 1']) p.equipment['Spell 1'] = inst.instanceId;
+    else if (base.subType === 'Air' && !p.equipment['Spell 2']) p.equipment['Spell 2'] = inst.instanceId;
+    else if (base.subType === 'Amulet' && !p.equipment['Amulet']) p.equipment['Amulet'] = inst.instanceId;
+    else if (base.subType === 'Ring' && !p.equipment['Ring']) p.equipment['Ring'] = inst.instanceId;
+    else if (base.subType === 'Rune' && !p.equipment['Accessory']) p.equipment['Accessory'] = inst.instanceId;
+  });
+  p.gems = [
+    { id: 'warStone', grade: 1 },
+    { id: 'loreStone', grade: 1 },
+    { id: 'vitalCore', grade: 1 },
+    { id: 'obsidianHeart', grade: 1 },
+    { id: 'mightrite', grade: 1 },
+    { id: 'spikeCore', grade: 1 },
+    { id: 'treasureCore', grade: 1 }
+  ];
+  Systems.calculateDerivedStats(p);
+  p.hp = p.derivedStats.maxHp;
+  return p;
+}
+
+const Systems = {
+  calculateDerivedStats(player) {
+    player.derivedStats = {};
+    const racialData = races[player.race] || races['human'];
+    let totalGearAC = 0, totalGearWC = 0, totalGearSC = 0;
+    for (const slotName in player.equipment) {
+      const instanceId = player.equipment[slotName];
+      if (!instanceId) continue;
+      const item = player.inventory.find(i => i.instanceId === instanceId);
+      if (!item) continue;
+      const baseItem = items.baseItemTemplates.find(b => b.id === item.baseItemId);
+      if (!baseItem) continue;
+      const slotData = progression.dropperSlotModifiers[baseItem.subType] || {};
+      const tierData = progression.dropperTiers.find(t => t.tier === item.tier) || progression.dropperTiers[0];
+      const itemStatValue = tierData.classValue * (slotData.statProportionality || 0.8);
+      if (slotData.statType === 'AC') totalGearAC += itemStatValue;
+      if (slotData.statType === 'WC') totalGearWC += itemStatValue;
+      if (slotData.statType === 'SC') totalGearSC += itemStatValue;
+    }
+    const scalingStatValue = player.baseStats[racialData.primaryStat] || 10;
+    player.derivedStats.maxHp = 100 + ((player.baseStats.VIT || 10) * 10);
+    player.derivedStats.AC = Math.max(10, totalGearAC * (1 + ((player.baseStats.VIT || 10) * 0.0075)));
+    player.derivedStats.WC = Math.max(12, totalGearWC * (1 + (scalingStatValue * 0.0055)));
+    player.derivedStats.SC = Math.max(10, totalGearSC * (1 + (scalingStatValue * 0.0055)));
+    player.derivedStats.hitChance = Math.min(99, 90 + ((player.baseStats.DEX || 10) * 0.05));
+    player.derivedStats.critChance = Math.min(60, 5 + ((player.baseStats.DEX || 10) * 0.01));
+    if (player.hp === undefined || player.hp > player.derivedStats.maxHp) player.hp = player.derivedStats.maxHp;
+    return player;
+  },
+  resolveCombatTurn(player, monster, isMagic = false) {
+    const classValue = isMagic ? (player.derivedStats.SC || 12) : (player.derivedStats.WC || 15);
+    let playerDamage = (gddConstants.PLAYER_DAMAGE_CONSTANT * classValue) / Math.max(5, monster.def);
+    monster.currentHP -= playerDamage;
+    if (monster.currentHP <= 0) { monster.currentHP = 0; return { status: 'VICTORY', player, monster, damageDealt: playerDamage }; }
+    let monsterDamage = Math.max(1, monster.atk - (player.derivedStats.AC * gddConstants.MONSTER_DAMAGE_AC_REDUCTION_FACTOR));
+    player.hp -= monsterDamage;
+    if (player.hp <= 0) { player.hp = 0; return { status: 'DEFEAT', player, monster, damageTaken: monsterDamage }; }
+    return { status: 'CONTINUE', player, monster, damageDealt: playerDamage, damageTaken: monsterDamage };
+  }
+};
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast-notification');
+  if (!toast) return;
+  toast.innerHTML = message;
+  toast.className = `glass-panel fixed left-1/2 -translate-x-1/2 z-[210] transition-all duration-300 ease-out px-5 py-2 rounded-full font-medium text-xs ${isError ? 'bg-red-950/85 border-red-500 text-red-200 shadow-[0_0_15px_rgba(255,51,85,0.4)]' : 'bg-black border border-white/30 text-white shadow-2xl'}`;
+  toast.style.bottom = '4.5rem';
+  setTimeout(() => { toast.style.bottom = '-100px'; }, 2800);
+}
+
+function showConfirm(title, message, onConfirm) {
+  const backdrop = document.getElementById('confirm-modal-backdrop');
+  const titleEl = document.getElementById('confirm-modal-title');
+  const msgEl = document.getElementById('confirm-modal-msg');
+  const okBtn = document.getElementById('confirm-modal-ok');
+  const cancelBtn = document.getElementById('confirm-modal-cancel');
+  if (!backdrop) return;
+  titleEl.textContent = title;
+  msgEl.textContent = message;
+  backdrop.classList.remove('hidden');
+  const close = () => { backdrop.classList.add('hidden'); };
+  okBtn.onclick = () => { close(); if (typeof onConfirm === 'function') onConfirm(); };
+  cancelBtn.onclick = () => close();
+}
+
+const smokeCanvas = document.getElementById('smoke-canvas');
+const smokeCtx = smokeCanvas.getContext('2d');
+smokeCanvas.width = window.innerWidth;
+smokeCanvas.height = window.innerHeight;
+let smokeParticles = [];
+class MultiToneSmokeParticle {
+  constructor() { this.reset(true); }
+  reset(initial = false) {
+    this.x = initial ? Math.random() * smokeCanvas.width : (Math.random() > 0.5 ? -100 : smokeCanvas.width + 100);
+    this.y = Math.random() * smokeCanvas.height;
+    this.size = Math.random() * 240 + 80;
+    this.speedX = (Math.random() - 0.5) * 0.45;
+    this.speedY = (Math.random() - 0.5) * 0.35;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.004;
+    const roll = Math.random();
+    if (roll < 0.35) {
+      this.type = 'white'; this.baseAlpha = Math.random() * 0.05 + 0.02; this.r = 240; this.g = 245; this.b = 255;
+    } else if (roll < 0.70) {
+      this.type = 'black'; this.baseAlpha = Math.random() * 0.22 + 0.08; this.r = 0; this.g = 0; this.b = 0;
+    } else {
+      this.type = 'onyx'; this.baseAlpha = Math.random() * 0.18 + 0.06; this.r = 12; this.g = 12; this.b = 16;
+    }
+  }
+  update() {
+    this.x += this.speedX; this.y += this.speedY; this.rotation += this.rotSpeed;
+    if (this.x < -this.size * 1.5 || this.x > smokeCanvas.width + this.size * 1.5 || this.y < -this.size * 1.5 || this.y > smokeCanvas.height + this.size * 1.5) this.reset();
+  }
+  draw() {
+    smokeCtx.save();
+    smokeCtx.translate(this.x, this.y);
+    smokeCtx.rotate(this.rotation);
+    const g = smokeCtx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+    if (this.type === 'black') {
+      g.addColorStop(0, `rgba(0, 0, 0, ${this.baseAlpha * 1.4})`);
+      g.addColorStop(0.5, `rgba(0, 0, 0, ${this.baseAlpha * 0.7})`);
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    } else if (this.type === 'white') {
+      g.addColorStop(0, `rgba(${this.r}, ${this.g}, ${this.b}, ${this.baseAlpha * 1.2})`);
+      g.addColorStop(0.4, `rgba(200, 210, 225, ${this.baseAlpha * 0.5})`);
+      g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    } else {
+      g.addColorStop(0, `rgba(${this.r}, ${this.g}, ${this.b}, ${this.baseAlpha * 1.3})`);
+      g.addColorStop(0.5, `rgba(5, 5, 8, ${this.baseAlpha * 0.6})`);
+      g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    }
+    smokeCtx.fillStyle = g;
+    smokeCtx.beginPath();
+    smokeCtx.arc(0, 0, this.size, 0, Math.PI * 2);
+    smokeCtx.fill();
+    smokeCtx.restore();
+  }
+}
+
+function initSmoke() {
+  smokeParticles = [];
+  for (let i = 0; i < 40; i++) smokeParticles.push(new MultiToneSmokeParticle());
+}
+function animateSmoke() {
+  smokeCtx.clearRect(0, 0, smokeCanvas.width, smokeCanvas.height);
+  for (let p of smokeParticles) { p.update(); p.draw(); }
+  requestAnimationFrame(animateSmoke);
+}
+window.addEventListener('resize', () => {
+  smokeCanvas.width = window.innerWidth;
+  smokeCanvas.height = window.innerHeight;
+  initSmoke();
+  ZoneManager.resizeCanvas();
+  WorldMapManager.resize();
+});
+initSmoke();
+animateSmoke();
+
+const DataManager = {
+  async init() {
+    try {
+      const d = localStorage.getItem('geminus_player_save');
+      if (d) state.player = JSON.parse(d);
+    } catch(e) {}
+    if (state.player && (state.player.inventory.some(i => i.instanceId && i.instanceId.startsWith('item_max_')) || state.player.inventory.length > 50)) {
+      state.player = createDefaultPlayer('Jeff', 'human');
+      localStorage.setItem('geminus_player_save', JSON.stringify(state.player));
+    }
+    if (state.player && state.player.equipment) {
+      if (state.player.equipment['Gauntlets'] && !state.player.equipment['Gloves']) {
+        state.player.equipment['Gloves'] = state.player.equipment['Gauntlets'];
+        delete state.player.equipment['Gauntlets'];
+      }
+      if (state.player.equipment['Accessories'] && !state.player.equipment['Accessory']) {
+        state.player.equipment['Accessory'] = state.player.equipment['Accessories'];
+        delete state.player.equipment['Accessories'];
+      }
+    }
+    if (!state.player) state.player = createDefaultPlayer('Jeff', 'human');
+    if (!state.player._bankGrant10k || !state.player.bank || state.player.bank < 10000) {
+      state.player.bank = 10000;
+      state.player._bankGrant10k = true;
+      localStorage.setItem('geminus_player_save', JSON.stringify(state.player));
+    }
+    try {
+      const bs = localStorage.getItem('geminus_battle_stats');
+      if (bs) state.battleStats = JSON.parse(bs);
+    } catch(e) {
+      state.battleStats = { levels: 0, kills: 0, rounds: 0, deaths: 0, oneHitKills: 0 };
+    }
+    GameManager.init();
+  },
+  savePlayer(playerData) { try { localStorage.setItem('geminus_player_save', JSON.stringify(playerData)); } catch(e) {} },
+  updatePlayer(fields) { if (state.player) localStorage.setItem('geminus_player_save', JSON.stringify(state.player)); },
+  saveBattleStats() { try { localStorage.setItem('geminus_battle_stats', JSON.stringify(state.battleStats)); } catch(e) {} }
+};
+
+const InlinePanelManager = {
+  activeTab: null,
+  pinned: false,
+  inventoryBags: {
+    'Weapon Chest': ['Weapons'],
+    'Bag of Gear': ['Armor'],
+    'Jewelry Box': ['Amulet', 'Ring', 'Accessory'],
+    'Spell Satchel': ['Spells']
+  },
+  filterState: { category: 'All', subType: 'All', tier: 'All', quality: 'All', sortBy: 'tier', order: 'desc' },
+  init() {
+    const tabMap = { 'nav-btn-equipment': 'equipment', 'nav-btn-inventory': 'inventory', 'nav-btn-stats': 'stats', 'nav-btn-training': 'training', 'nav-btn-settings': 'settings' };
+    for (const [id, tab] of Object.entries(tabMap)) {
+      document.getElementById(id)?.addEventListener('click', () => this.open(tab));
+    }
+    document.querySelectorAll('.panel-tab-pill').forEach(btn => {
+      btn.addEventListener('click', () => this.switchTab(btn.dataset.panel));
+    });
+    document.getElementById('panel-close-btn')?.addEventListener('click', () => this.close());
+    const pinBtn = document.getElementById('panel-pin-btn');
+    pinBtn?.addEventListener('click', () => {
+      this.pinned = !this.pinned;
+      pinBtn.classList.toggle('pinned', this.pinned);
+      pinBtn.title = this.pinned ? 'Unpin panel' : 'Pin panel open';
+      showToast(this.pinned ? '📌 Panel pinned open' : 'Panel unpinned');
+    });
+  },
+  open(tab) {
+    this.activeTab = tab;
+    document.getElementById('hud-section').classList.add('hidden-hud');
+    document.getElementById('inline-panel').classList.add('visible');
+    this.switchTab(tab);
+    document.querySelectorAll('[id^="nav-btn-"]').forEach(b => b.classList.remove('tab-active'));
+    const navId = { equipment:'nav-btn-equipment', inventory:'nav-btn-inventory', stats:'nav-btn-stats', training:'nav-btn-training', settings:'nav-btn-settings' }[tab];
+    if (navId) document.getElementById(navId)?.classList.add('tab-active');
+  },
+  switchTab(tab) {
+    this.activeTab = tab;
+    document.querySelectorAll('.panel-content').forEach(el => el.classList.add('hidden'));
+    const target = document.getElementById(`panel-content-${tab}`);
+    if (target) target.classList.remove('hidden');
+    document.querySelectorAll('.panel-tab-pill').forEach(b => b.classList.remove('tab-active'));
+    document.querySelector(`.panel-tab-pill[data-panel="${tab}"]`)?.classList.add('tab-active');
+    if (tab === 'equipment') this.renderEquipment();
+    if (tab === 'inventory') this.renderInventory();
+    if (tab === 'stats') this.renderStats();
+    if (tab === 'training') this.renderTraining();
+    if (tab === 'settings') this.renderSettings();
+  },
+  close() {
+    this.activeTab = null;
+    document.getElementById('inline-panel').classList.remove('visible');
+    document.getElementById('hud-section').classList.remove('hidden-hud');
+    document.querySelectorAll('[id^="nav-btn-"]').forEach(b => b.classList.remove('tab-active'));
+  },
+  generateGemOverlaysHTML(item) {
+    if (!item.socketedGems || item.socketedGems.length === 0) return '';
+    let overlaysHTML = '<div class="gem-overlays-container">';
+    const gem1 = item.socketedGems[0];
+    const gem2 = item.socketedGems[1];
+    if (gem1) {
+      const gemData1 = gems.standard[gem1.id] || { name: 'Gem', category: 'Fighter' };
+      overlaysHTML += `<div class="gem-overlay ${gemData1.category.toLowerCase()}">${gemData1.name.slice(0,3)}</div>`;
+    }
+    if (!gem1 && gem2) overlaysHTML += '<div></div>';
+    if (gem2) {
+      const gemData2 = gems.standard[gem2.id] || { name: 'Gem', category: 'Caster' };
+      overlaysHTML += `<div class="gem-overlay ${gemData2.category.toLowerCase()}">${gemData2.name.slice(0,3)}</div>`;
+    }
+    overlaysHTML += '</div>';
+    return overlaysHTML;
+  },
+  renderEquipment() {
+    const el = document.getElementById('panel-content-equipment');
+    if (!el || !state.player) return;
+    el.innerHTML = `<div class="equipment-grid">` + equipmentSlotConfig.map(slot => {
+      const instId = state.player.equipment[slot.name];
+      const item = state.player.inventory.find(i => i.instanceId === instId);
+      const base = item ? items.baseItemTemplates.find(b => b.id === item.baseItemId) : null;
+      const overlays = item ? this.generateGemOverlaysHTML(item) : '';
+      const icon = base ? getItemVectorIcon(base.subType, base.type) : '<span class="text-[11px] text-zinc-500">Empty</span>';
+      return `<div class="equipment-slot-wrapper">
+        <div class="equipment-slot-title"><span>${slot.name}</span></div>
+        <div class="equipment-slot-content" onclick="window.handleItemTap('${instId||''}')">
+          ${overlays}
+          <div class="flex items-center justify-center">${icon}</div>
+          ${base ? `<span class="item-tier-label">T${item.tier}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+  },
+  populateFilterOptions() {
+    const catSel = document.getElementById('inventory-filter-category-select');
+    const tierSel = document.getElementById('inventory-filter-tier-select');
+    const qualSel = document.getElementById('inventory-filter-quality-select');
+    const sortSel = document.getElementById('inventory-sort-by-select');
+    const orderSel = document.getElementById('inventory-sort-order-select');
+    if (!catSel) return;
+
+    catSel.innerHTML = ['All', ...Object.keys(this.inventoryBags)].map(c => `<option value="${c}" class="bg-[#0b1019] text-white">${c}</option>`).join("");
+    catSel.value = this.filterState.category;
+
+    if (tierSel) {
+      tierSel.innerHTML = '<option value="All" class="bg-[#0b1019] text-white">All Tiers</option>' + Array.from({length: 20}, (_, i) => `<option value="${i+1}" class="bg-[#0b1019] text-white">Tier ${i+1}</option>`).join("");
+      tierSel.value = this.filterState.tier;
+    }
+
+    if (qualSel) {
+      qualSel.innerHTML = ['All', 'Dropper', 'Shadow', 'Echo'].map(q => `<option value="${q}" class="bg-[#0b1019] text-white">${q}</option>`).join("");
+      qualSel.value = this.filterState.quality;
+    }
+
+    if (sortSel) sortSel.value = this.filterState.sortBy;
+    if (orderSel) orderSel.value = this.filterState.order;
+
+    this.populateSubTypeFilter();
+  },
+  populateSubTypeFilter() {
+    const subTypeSelect = document.getElementById('inventory-filter-subtype-select');
+    if (!subTypeSelect) return;
+    const category = this.filterState.category;
+    let subTypes = new Set();
+    items.baseItemTemplates.forEach(item => {
+      if (category === 'All' || this.inventoryBags[category]?.includes(item.type)) {
+        subTypes.add(item.subType || item.type);
+      }
+    });
+    subTypeSelect.innerHTML = ['All', ...Array.from(subTypes).sort()].map(s => `<option value="${s}" class="bg-[#0b1019] text-white">${s}</option>`).join("");
+    subTypeSelect.value = this.filterState.subType;
+  },
+  renderInventoryBags() {
+    const bagsContainer = document.getElementById('inventory-bags-container');
+    if (!bagsContainer || !state.player) return;
+
+    const equipped = Object.values(state.player.equipment).filter(Boolean);
+    const unequipped = state.player.inventory.filter(i => !equipped.includes(i.instanceId));
+
+    const { category, subType, tier, quality, sortBy, order } = this.filterState;
+
+    const filtered = unequipped.filter(item => {
+      const base = items.baseItemTemplates.find(b => b.id === item.baseItemId);
+      if (!base) return false;
+      if (category !== 'All' && !this.inventoryBags[category]?.includes(base.type)) return false;
+      if (subType !== 'All' && (base.subType || base.type) !== subType) return false;
+      if (tier !== 'All' && item.tier.toString() !== tier) return false;
+      if (quality !== 'All' && (item.type || 'Dropper') !== quality) return false;
+      return true;
+    });
+
+    filtered.sort((a, b) => {
+      const baseA = items.baseItemTemplates.find(item => item.id === a.baseItemId);
+      const baseB = items.baseItemTemplates.find(item => item.id === b.baseItemId);
+      let compareA = (sortBy === 'name') ? (baseA?.name || '') : (sortBy === 'type' ? (baseA?.type || '') : a.tier);
+      let compareB = (sortBy === 'name') ? (baseB?.name || '') : (sortBy === 'type' ? (baseB?.type || '') : b.tier);
+
+      if (typeof compareA === 'string') {
+        return order === 'asc' ? compareA.localeCompare(compareB) : compareB.localeCompare(compareA);
+      }
+      if (compareA < compareB) return order === 'asc' ? -1 : 1;
+      if (compareA > compareB) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    let bagsHTML = Object.entries(this.inventoryBags).map(([bagName, types]) => {
+      const bagItems = filtered.filter(item => {
+        const base = items.baseItemTemplates.find(b => b.id === item.baseItemId);
+        return base && types.includes(base.type);
+      });
+      return `<div class="stat-accordion-item open">
+        <button class="stat-accordion-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="text-xs font-bold text-white flex items-center gap-2">
+            <span>📦</span> ${bagName}
+            <span class="text-[10px] text-zinc-400 font-mono">(${bagItems.length})</span>
+          </span>
+          <svg class="accordion-arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+        <div class="stat-accordion-content">
+          <div class="inventory-grid">
+            ${bagItems.length === 0 ? '<div class="col-span-4 text-center py-4 text-zinc-500 text-[11px]">No items found</div>' : bagItems.map(item => {
+              const base = items.baseItemTemplates.find(b => b.id === item.baseItemId);
+              const overlays = this.generateGemOverlaysHTML(item);
+              const icon = getItemVectorIcon(base?.subType, base?.type);
+              return `<div class="inventory-slot" onclick="window.handleItemTap('${item.instanceId}')" title="${base?.name || 'Item'}">
+                ${overlays}
+                <div class="item-icon-wrapper">${icon}</div>
+                <span class="item-tier-label">T${item.tier}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const gemPouchHTML = `<div class="stat-accordion-item open">
+      <button class="stat-accordion-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="text-xs font-bold text-white flex items-center gap-2">
+          <span>💎</span> Gem Pouch
+          <span class="text-[10px] text-zinc-400 font-mono">(${state.player.gems.length}/200)</span>
+        </span>
+        <svg class="accordion-arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <div class="stat-accordion-content">
+        <div class="gem-pouch-grid">
+          ${state.player.gems.length === 0 ? '<div class="col-span-4 text-center py-4 text-zinc-500 text-[11px]">No gems stored</div>' : state.player.gems.map(g => {
+            const gemData = gems.standard[g.id] || { name: 'Gem', color: 'Blue', effect: 'Socketable' };
+            return `<div class="gem-item" onclick="window.handleGemTap('${g.id}', ${g.grade})" title="${gemData.name} (Grade ${g.grade}): ${gemData.effect}">
+              <span class="text-xs">${gemData.color === 'Red' ? '🔴' : gemData.color === 'Blue' ? '🔵' : '🟢'}</span>
+              <span class="item-label">${gemData.name.slice(0,3)}${g.grade}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+
+    bagsContainer.innerHTML = bagsHTML + gemPouchHTML;
+  },
+  renderInventory() {
+    const el = document.getElementById('panel-content-inventory');
+    if (!el || !state.player) return;
+
+    el.innerHTML = `<div class="space-y-2">
+      <div class="pb-1 border-b border-white/10"><span class="text-[11px] text-white font-bold uppercase tracking-wider">Inventory Ledger</span></div>
+      
+      <div id="inventory-sort-container" class="mb-2">
+        <div class="stat-accordion-item open">
+          <button class="stat-accordion-header" onclick="this.parentElement.classList.toggle('open')">
+            <h3 class="text-xs font-bold text-white flex items-center font-orbitron">
+              <svg class="w-4 h-4 mr-1.5 inline-block text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9M3 12h9m-9 4h6"></path>
+              </svg>
+              Sort & Filter
+            </h3>
+            <svg class="accordion-arrow w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <div class="stat-accordion-content !p-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Category</label>
+                <select id="inventory-filter-category-select" class="editor-input !w-full !text-xs !py-1"></select>
+              </div>
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Sub-Type</label>
+                <select id="inventory-filter-subtype-select" class="editor-input !w-full !text-xs !py-1"></select>
+              </div>
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Tier</label>
+                <select id="inventory-filter-tier-select" class="editor-input !w-full !text-xs !py-1"></select>
+              </div>
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Quality</label>
+                <select id="inventory-filter-quality-select" class="editor-input !w-full !text-xs !py-1"></select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mt-2 border-t border-white/10 pt-2">
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Sort By</label>
+                <select id="inventory-sort-by-select" class="editor-input !w-full !text-xs !py-1">
+                  <option value="tier" class="bg-[#0b1019] text-white">Tier</option>
+                  <option value="name" class="bg-[#0b1019] text-white">Name</option>
+                  <option value="type" class="bg-[#0b1019] text-white">Type</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10.5px] font-bold text-zinc-300 block mb-0.5">Order</label>
+                <select id="inventory-sort-order-select" class="editor-input !w-full !text-xs !py-1">
+                  <option value="desc" class="bg-[#0b1019] text-white">Descending</option>
+                  <option value="asc" class="bg-[#0b1019] text-white">Ascending</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="inventory-bags-container" class="space-y-2"></div>
+    </div>`;
+
+    this.populateFilterOptions();
+
+    el.addEventListener('change', (e) => {
+      const targetId = e.target.id;
+      if (targetId.startsWith('inventory-filter-') || targetId.startsWith('inventory-sort-')) {
+        this.filterState.category = document.getElementById('inventory-filter-category-select')?.value || 'All';
+        this.filterState.subType = document.getElementById('inventory-filter-subtype-select')?.value || 'All';
+        this.filterState.tier = document.getElementById('inventory-filter-tier-select')?.value || 'All';
+        this.filterState.quality = document.getElementById('inventory-filter-quality-select')?.value || 'All';
+        this.filterState.sortBy = document.getElementById('inventory-sort-by-select')?.value || 'tier';
+        this.filterState.order = document.getElementById('inventory-sort-order-select')?.value || 'desc';
+
+        if (targetId === 'inventory-filter-category-select') {
+          this.filterState.subType = 'All';
+          this.populateSubTypeFilter();
+        }
+
+        this.renderInventoryBags();
+      }
+    });
+
+    this.renderInventoryBags();
+  },
+  renderStats() {
+    const el = document.getElementById('panel-content-stats');
+    if (!el || !state.player) return;
+    const p = state.player;
+    el.innerHTML = `<div class="space-y-2">
+      <div class="p-2.5 rounded-xl bg-black/60 border border-white/12">
+        <span class="text-[10px] text-white font-bold uppercase tracking-wider block mb-1.5">Combat Attributes</span>
+        <div class="space-y-0.5 text-xs">
+          <div class="flex justify-between py-1 border-b border-white/10"><span class="text-zinc-400">Armor Class (AC)</span><span class="text-white font-bold font-mono">${p.derivedStats.AC?.toFixed(1)}</span></div>
+          <div class="flex justify-between py-1 border-b border-white/10"><span class="text-zinc-400">Weapon Class (WC)</span><span class="text-white font-bold font-mono">${p.derivedStats.WC?.toFixed(1)}</span></div>
+          <div class="flex justify-between py-1 border-b border-white/10"><span class="text-zinc-400">Spell Class (SC)</span><span class="text-white font-bold font-mono">${p.derivedStats.SC?.toFixed(1)}</span></div>
+          <div class="flex justify-between py-1 border-b border-white/10"><span class="text-zinc-400">Hit Probability</span><span class="text-white font-bold font-mono">${p.derivedStats.hitChance?.toFixed(1)}%</span></div>
+          <div class="flex justify-between py-1 border-b border-white/10"><span class="text-zinc-400">Critical Chance</span><span class="text-white font-bold font-mono">${p.derivedStats.critChance?.toFixed(1)}%</span></div>
+          <div class="flex justify-between py-1"><span class="text-zinc-400">Max Health</span><span class="text-white font-bold font-mono">${Math.round(p.derivedStats.maxHp)}</span></div>
+        </div>
+      </div>
+    </div>`;
+  },
+  renderTraining() {
+    const el = document.getElementById('panel-content-training');
+    if (!el) return;
+    const s = state.battleStats || { levels: 0, kills: 0, rounds: 0, deaths: 0, oneHitKills: 0 };
+    const oneHitPct = s.kills > 0 ? Math.round((s.oneHitKills / s.kills) * 100) : 0;
+    el.innerHTML = `<div class="p-3 rounded-xl bg-black/60 border border-white/12 text-xs">
+      <h3 class="text-sm font-bold text-white underline underline-offset-4 decoration-white mb-3">Battle Statistics</h3>
+      <div class="space-y-2 font-mono text-[12.5px]">
+        <div><span class="font-bold text-white font-sans">Levels: </span><span class="font-bold text-white bg-black px-1 rounded border border-neutral-800">${formatCompactNumber(s.levels)}</span></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><span class="font-bold text-white font-sans">Kills: </span><span class="font-bold text-white bg-black px-1 rounded border border-neutral-800">${formatCompactNumber(s.kills)}</span></div>
+          <div><span class="font-bold text-white font-sans">Rounds: </span><span class="font-bold text-white bg-black px-1 rounded border border-neutral-800">${formatCompactNumber(s.rounds)}</span></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><span class="font-bold text-white font-sans">Deaths: </span><span class="font-bold text-white bg-black px-1 rounded border border-neutral-800">${formatCompactNumber(s.deaths)}</span></div>
+          <div><span class="font-bold text-white font-sans">1 Hit Kill %: </span><span class="font-bold text-white bg-black px-1 rounded border border-neutral-800">${oneHitPct}%</span></div>
+        </div>
+      </div>
+    </div>`;
+  },
+  renderSettings() {
+    const el = document.getElementById('panel-content-settings');
+    if (!el) return;
+    el.innerHTML = `<div class="space-y-2 text-xs">
+      <div class="p-2.5 rounded-xl bg-black/60 border border-white/12">
+        <span class="text-[10px] text-white font-bold uppercase tracking-wider block mb-2">Pilot Profile</span>
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-zinc-300 font-medium">Pilot Callsign</span>
+          <input id="settings-name-input" class="editor-input !py-1 !w-36 !text-xs" value="${state.player?.name||'Jeff'}">
+        </div>
+        <button onclick="window.saveSettingsName()" class="glass-button w-full mt-2 py-1.5 text-xs rounded-lg">Update Profile</button>
+        <button onclick="window.resetSave()" class="mt-2 w-full py-1.5 text-xs rounded-lg border border-red-500/40 text-red-400 hover:bg-red-500/10">Reset Progress & Restore Chassis</button>
+      </div>
+      <div class="p-2.5 rounded-xl bg-black/60 border border-white/12">
+        <span class="text-[10px] text-white font-bold uppercase tracking-wider block mb-2">Display</span>
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <div class="text-zinc-200 font-medium">Dark Mode</div>
+            <div class="text-[10px] text-zinc-500">Onyx black HUD — no cyan glass</div>
+          </div>
+          <button type="button" id="theme-toggle" onclick="window.toggleDarkMode()" class="footer-tab-button !px-3 !py-1.5 text-[11px]">${(localStorage.getItem('g_theme')==='onyx')?'On':'Off'}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+};
+
+window.applyTheme = (theme) => {
+  const onyx = theme === 'onyx';
+  document.documentElement.classList.toggle('theme-onyx', onyx);
+  localStorage.setItem('g_theme', onyx ? 'onyx' : 'aether');
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = onyx ? 'On' : 'Off';
+};
+window.toggleDarkMode = () => {
+  const next = document.documentElement.classList.contains('theme-onyx') ? 'aether' : 'onyx';
+  window.applyTheme(next);
+  showToast(next === 'onyx' ? 'Dark Mode on — Onyx HUD' : 'Aether glass restored');
+};
+window.applyTheme(localStorage.getItem('g_theme') || 'aether');
+
+window.saveSettingsName = () => {
+  const val = document.getElementById('settings-name-input')?.value?.trim();
+  if (val && state.player) {
+    state.player.name = val;
+    UIManager.updatePlayerStatusUI();
+    DataManager.updatePlayer(state.player);
+    showToast('Profile callsign updated.');
+  }
+};
+
+window.resetSave = () => {
+  showConfirm('Reset Save Data', 'This will wipe progression and restore default gear. Proceed?', () => {
+    localStorage.removeItem('geminus_player_save');
+    localStorage.removeItem('geminus_battle_stats');
+    state.player = createDefaultPlayer('Jeff', 'human');
+    state.battleStats = { levels: 0, kills: 0, rounds: 0, deaths: 0, oneHitKills: 0 };
+    Systems.calculateDerivedStats(state.player);
+    UIManager.updatePlayerStatusUI();
+    CombatManager.updateStatsDisplay();
+    showToast('Save data reset.');
+    InlinePanelManager.close();
+  });
+};
+
+const mockOnlinePlayers = [
+  { id: 'P01', name: 'JuugBoyTV', level: 12, hp: 420, atk: 28, def: 24, xp: 180, gold: 95, drop: { name: 'Champion Shard', rarity: 'Epic' } },
+  { id: 'P02', name: 'Valkyrie_Nova', level: 8, hp: 310, atk: 21, def: 19, xp: 95, gold: 50, drop: { name: 'Winged Crest', rarity: 'Rare' } },
+  { id: 'P03', name: 'ShadowWraith', level: 15, hp: 550, atk: 35, def: 30, xp: 260, gold: 140, drop: { name: 'Void Band', rarity: 'Legendary' } },
+  { id: 'P04', name: 'AetherKnight', level: 5, hp: 220, atk: 16, def: 15, xp: 60, gold: 30, drop: { name: 'Silver Insignia', rarity: 'Uncommon' } }
+];
+
+const CombatManager = {
+  isInitialized: false,
+  currentMonster: null,
+  currentTargetType: 'monsters',
+  isEngaged: false,
+  _turnCount: 0,
+  init() {
+    if (this.isInitialized) return;
+    this.isInitialized = true;
+    document.getElementById('fightBtn')?.addEventListener('click', () => this.toggleEngage());
+    document.getElementById('combat-fight-btn')?.addEventListener('click', () => this.performTurn(false));
+    document.getElementById('combat-cast-btn')?.addEventListener('click', () => this.performTurn(true));
+    document.getElementById('targetTypeSelect')?.addEventListener('change', (e) => {
+      this.currentTargetType = e.target.value;
+      if (this.isEngaged) this.toggleEngage();
+      this.populateTargetList();
+    });
+    document.getElementById('monsterSelect')?.addEventListener('change', (e) => {
+      const selectedId = e.target.value;
+      if (!selectedId) { this.currentMonster = null; return; }
+      if (this.currentTargetType === 'monsters') {
+        const m = bestiary['Z01'].monsters.find(x => x.id === selectedId);
+        if (m) {
+          this.currentMonster = { ...m, currentHP: m.hp };
+          this.spawnFX(`🎯 ${m.name}`, '#ffffff');
+        }
+      } else {
+        const p = mockOnlinePlayers.find(x => x.id === selectedId);
+        if (p) {
+          this.currentMonster = { ...p, currentHP: p.hp };
+          this.spawnFX(`⚔ Duel: ${p.name}`, '#FFD60A');
+        }
+      }
+    });
+    this.populateTargetList();
+    this.updateStatsDisplay();
+  },
+  populateTargetList() {
+    const sel = document.getElementById('monsterSelect');
+    if (!sel) return;
+    if (this.currentTargetType === 'monsters') {
+      sel.innerHTML = '<option value="" class="bg-[#0b1019] text-zinc-400">Select Target Enemy...</option>' +
+        bestiary['Z01'].monsters.map(m => `<option value="${m.id}" class="bg-[#0b1019] text-white">${m.name} [HP ${m.hp}]</option>`).join('');
+      sel.value = bestiary['Z01'].monsters[0].id;
+      const m = bestiary['Z01'].monsters[0];
+      this.currentMonster = { ...m, currentHP: m.hp };
+    } else {
+      sel.innerHTML = '<option value="" class="bg-[#0b1019] text-zinc-400">Select Target Player...</option>' +
+        mockOnlinePlayers.map(p => `<option value="${p.id}" class="bg-[#0b1019] text-white">${p.name} (Lvl ${p.level}) [HP ${p.hp}]</option>`).join('');
+      sel.value = mockOnlinePlayers[0].id;
+      const p = mockOnlinePlayers[0];
+      this.currentMonster = { ...p, currentHP: p.hp };
+    }
+  },
+  spawnFlyingToken(text, color, startEl, targetEl, onArrive) {
+    if (!startEl || !targetEl) return;
+    const startRect = startEl.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
+    const startX = startRect.left + (startRect.width / 2);
+    const startY = startRect.top + (startRect.height / 2);
+    const targetX = targetRect.left + (targetRect.width / 2);
+    const targetY = targetRect.top + (targetRect.height / 2);
+
+    const token = document.createElement('div');
+    token.style.position = 'fixed';
+    token.style.left = `${startX}px`;
+    token.style.top = `${startY}px`;
+    token.style.transform = 'translate(-50%, -50%) scale(0.85)';
+    token.style.color = color;
+    token.style.fontWeight = '800';
+    token.style.fontSize = '12px';
+    token.style.fontFamily = "'Orbitron', sans-serif";
+    token.style.textShadow = `0 0 12px ${color}, 0 2px 6px rgba(0,0,0,0.95)`;
+    token.style.pointerEvents = 'none';
+    token.style.zIndex = '9999';
+    token.style.transition = 'all 0.85s cubic-bezier(0.25, 1, 0.5, 1)';
+    token.style.opacity = '1';
+    token.innerHTML = text;
+    document.body.appendChild(token);
+
+    requestAnimationFrame(() => {
+      token.style.left = `${targetX}px`;
+      token.style.top = `${targetY}px`;
+      token.style.transform = 'translate(-50%, -50%) scale(1.15)';
+    });
+
+    setTimeout(() => {
+      token.style.opacity = '0';
+      token.style.transform = 'translate(-50%, -50%) scale(0.6)';
+      if (typeof onArrive === 'function') onArrive();
+      setTimeout(() => token.remove(), 250);
+    }, 780);
+  },
+  spawnFX(text, color = '#ffffff') {
+    const layer = document.getElementById('combat-fx-layer');
+    if (!layer) return;
+    const el = document.createElement('div');
+    el.className = 'combat-floating-effect';
+    el.style.color = color;
+    el.style.left = `${45 + (Math.random() * 20 - 10)}%`;
+    el.style.top = '60%';
+    el.innerHTML = text;
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 1400);
+  },
+  updateStatsDisplay() {
+    const p = state.player;
+    if (!p) return;
+    const hpEl = document.getElementById('combat-hp-display');
+    const hpBar = document.getElementById('combat-hp-bar');
+    if (hpEl) {
+      hpEl.textContent = `${formatCompactNumber(p.hp)} / ${formatCompactNumber(p.derivedStats.maxHp)}`;
+      // Health is kept green
+      hpEl.style.color = '#30D158';
+      if (hpBar) {
+        const pct = Math.max(0, Math.min(100, (p.hp / p.derivedStats.maxHp) * 100));
+        hpBar.style.width = `${pct}%`;
+        hpBar.style.background = '#30D158';
+        hpBar.style.boxShadow = `0 0 10px rgba(48, 209, 88, 0.6)`;
+      }
+    }
+    const xpEl = document.getElementById('top-xp-display');
+    if (xpEl) { 
+      xpEl.textContent = formatCompactNumber(p.xp); 
+      xpEl.style.color = '#cbd5e1'; 
+      xpEl.style.textShadow = 'none';
+    }
+    const nlEl = document.getElementById('top-nextlvl-display');
+    if (nlEl) { 
+      nlEl.textContent = formatCompactNumber(p.xpToNextLevel); 
+      nlEl.style.color = '#cbd5e1'; 
+      nlEl.style.textShadow = 'none';
+    }
+    const gEl = document.getElementById('top-gold-display');
+    if (gEl) { gEl.textContent = formatCompactNumber(p.gold); gEl.title = `Purse: ${Math.floor(p.gold).toLocaleString()} Gold`; gEl.style.color = ColorSystem.currency; }
+    const bEl = document.getElementById('top-bank-display');
+    if (bEl) { bEl.textContent = formatCompactNumber(p.bank ?? 10000); bEl.title = `Bank: ${Math.floor(p.bank ?? 10000).toLocaleString()} Gold`; bEl.style.color = ColorSystem.currency; }
+    const invCount = p.inventory.length;
+    const gemCount = p.gems.length;
+    const invCountDisplay = document.getElementById('combat-inv-count-display');
+    if (invCountDisplay) { invCountDisplay.textContent = `${invCount}/200`; invCountDisplay.style.color = ColorSystem.getInventoryColor(invCount, 200); }
+    const gemCountDisplay = document.getElementById('combat-gem-count-display');
+    if (gemCountDisplay) { gemCountDisplay.textContent = `${gemCount}/200`; gemCountDisplay.style.color = ColorSystem.getInventoryColor(gemCount, 200); }
+    
+    // Free levels & attribute points display in platinum/silver
+    const freeLevels = Math.floor((p.attributePoints || 0) / gddConstants.AP_PER_LEVEL);
+    const flEl = document.getElementById('core-free-levels-display');
+    if (flEl) flEl.innerHTML = `<span class="text-white font-bold mr-1">Lvls:</span><span class="text-slate-300 text-[10.5px] font-medium font-mono">${freeLevels} (${p.attributePoints||0} AP)</span>`;
+    
+    // Core stats in platinum/silver
+    const dexEl = document.getElementById('core-stat-dex');
+    if (dexEl) { dexEl.textContent = formatCompactNumber(p.baseStats.DEX); dexEl.style.color = '#cbd5e1'; }
+    const strEl = document.getElementById('core-stat-str');
+    if (strEl) { strEl.textContent = formatCompactNumber(p.baseStats.STR); strEl.style.color = '#cbd5e1'; }
+    const wisEl = document.getElementById('core-stat-wis');
+    if (wisEl) { wisEl.textContent = formatCompactNumber(p.baseStats.WIS); wisEl.style.color = '#cbd5e1'; }
+    const ntlEl = document.getElementById('core-stat-ntl');
+    if (ntlEl) { ntlEl.textContent = formatCompactNumber(p.baseStats.NTL); ntlEl.style.color = '#cbd5e1'; }
+    const vitEl = document.getElementById('core-stat-vit');
+    if (vitEl) { vitEl.textContent = formatCompactNumber(p.baseStats.VIT); vitEl.style.color = '#cbd5e1'; }
+
+    // Toggle glowing white on [+] buttons when levels/AP are available, black when disabled
+    const canAllocate = (p.attributePoints || 0) >= gddConstants.AP_PER_LEVEL;
+    document.querySelectorAll('#player-status-panel .attr-btn').forEach(btn => { 
+      btn.disabled = !canAllocate; 
+      btn.classList.toggle('glow-white', canAllocate);
+      if (canAllocate) {
+        btn.setAttribute('title', `Spend 1 Level (${gddConstants.AP_PER_LEVEL} AP)`);
+      } else {
+        btn.setAttribute('title', 'No attribute levels available');
+      }
+    });
+  },
+  toggleEngage() {
+    if (!this.currentMonster) {
+      const sel = document.getElementById('monsterSelect');
+      if (sel && sel.options.length > 1) {
+        sel.selectedIndex = 1;
+        const m = bestiary['Z01'].monsters.find(x => x.id === sel.value);
+        if (m) this.currentMonster = { ...m, currentHP: m.hp };
+      }
+    }
+    if (!this.currentMonster) {
+      showToast("Select target monster first.", true);
+      return;
+    }
+    this.isEngaged = !this.isEngaged;
+    const actionRow = document.getElementById('combat-action-row');
+    const engageBtn = document.getElementById('fightBtn');
+    const l1 = document.getElementById('combat-log-line-1');
+    const l2 = document.getElementById('combat-log-line-2');
+    const l3 = document.getElementById('combat-log-line-3');
+
+    if (this.isEngaged) {
+      this.currentMonster.currentHP = this.currentMonster.hp;
+      this._turnCount = 0;
+      actionRow.classList.remove('standby');
+      if (l1) l1.innerHTML = `Target Locked: <span class="text-white font-bold">${this.currentMonster.name}</span>`;
+      if (l2) l2.textContent = `HP: ${this.currentMonster.hp} | ATK: ${this.currentMonster.atk}`;
+      if (l3) l3.textContent = '';
+      engageBtn.textContent = 'DISENGAGE';
+      engageBtn.classList.add('active');
+      this.spawnFX('Engaged!', '#FFD60A');
+    } else {
+      actionRow.classList.add('standby');
+      if (l1) l1.textContent = '';
+      if (l2) l2.textContent = 'Select target & press BATTLE to fight';
+      if (l3) l3.textContent = '';
+      engageBtn.textContent = 'BATTLE';
+      engageBtn.classList.remove('active');
+      this.spawnFX('Disengaged', '#8FA8C7');
+    }
+  },
+  performTurn(isMagic = false) {
+    if (!this.isEngaged || !this.currentMonster) return;
+    state.battleStats.rounds++;
+    const res = Systems.resolveCombatTurn(state.player, this.currentMonster, isMagic);
+    this._turnCount++;
+
+    const monsterName = this.currentMonster.name;
+    const damageDealt = Math.round(res.damageDealt || 0);
+    const damageTaken = Math.round(res.damageTaken || 0);
+
+    const l1 = document.getElementById('combat-log-line-1');
+    const l2 = document.getElementById('combat-log-line-2');
+    const l3 = document.getElementById('combat-log-line-3');
+    const actionRow = document.getElementById('combat-action-row');
+    const engageBtn = document.getElementById('fightBtn');
+    const combatBox = document.getElementById('combat-ticker-log') || document.getElementById('combat-action-row');
+
+    if (res.status === 'VICTORY') {
+      state.battleStats.kills++;
+      if (this._turnCount === 1) state.battleStats.oneHitKills++;
+      DataManager.saveBattleStats();
+
+      const earnedGold = this.currentMonster.gold;
+      const earnedXp = this.currentMonster.xp;
+      state.player.gold += earnedGold;
+      state.player.xp += earnedXp;
+
+      if (l1) l1.innerHTML = damageTaken > 0 ? `<span class="text-rose-400 font-bold">${monsterName}</span> hit you for <span class="text-rose-400 font-bold">${damageTaken}</span> dmg!` : `You struck first with agility!`;
+      if (l2) l2.innerHTML = `You hit <span class="text-white font-bold">${monsterName}</span> for <span class="text-white font-bold">${damageDealt}</span> dmg!`;
+      if (l3) l3.innerHTML = `<span class="text-amber-400 font-extrabold uppercase tracking-wide">Enemy is dead! Press BATTLE</span>`;
+
+      const goldDisplayEl = document.getElementById('top-gold-display');
+      const xpDisplayEl = document.getElementById('top-xp-display');
+
+      if (combatBox && goldDisplayEl) {
+        this.spawnFlyingToken(`+${earnedGold} Gold`, '#FFD60A', combatBox, goldDisplayEl, () => {
+          goldDisplayEl.style.textShadow = '0 0 14px rgba(255, 214, 10, 0.9)';
+          setTimeout(() => { goldDisplayEl.style.textShadow = ''; }, 400);
+        });
+      }
+
+      if (combatBox && xpDisplayEl) {
+        setTimeout(() => {
+          this.spawnFlyingToken(`+${earnedXp} EXP`, '#ffffff', combatBox, xpDisplayEl, () => {
+            xpDisplayEl.style.textShadow = '0 0 14px rgba(255, 255, 255, 0.9)';
+            setTimeout(() => { xpDisplayEl.style.textShadow = '0 0 8px rgba(255, 255, 255, 0.4)'; }, 400);
+          });
+        }, 120);
+      }
+
+      const drop = this.currentMonster.drop || { name: `${this.currentMonster.name} Core`, rarity: 'Rare' };
+      state.game.lastDrop = drop;
+      state.game.lastItem = drop;
+      const lastItemEl = document.getElementById('combat-lastitem-display');
+      if (lastItemEl) {
+        lastItemEl.textContent = drop.name;
+        lastItemEl.style.color = ColorSystem.getRarityColor(drop.rarity);
+      }
+
+      if (Math.random() < 0.35) {
+        const allStandardGems = Object.values(gems.standard);
+        const randomGem = allStandardGems[Math.floor(Math.random() * allStandardGems.length)];
+        const newGem = { id: randomGem.id, grade: 1 };
+        if (state.player.gems.length < 200) {
+          state.player.gems.push(newGem);
+          state.game.lastGem = { name: `${randomGem.name} G1`, rarity: 'Rare' };
+          const lastGemEl = document.getElementById('combat-lastgem-display');
+          if (lastGemEl) {
+            lastGemEl.textContent = `${randomGem.name} G1`;
+            lastGemEl.style.color = ColorSystem.getRarityColor('Rare');
+          }
+        }
+      }
+
+      if (state.player.xp >= state.player.xpToNextLevel) {
+        state.player.level++;
+        state.battleStats.levels++;
+        DataManager.saveBattleStats();
+        state.player.xp -= state.player.xpToNextLevel;
+        state.player.attributePoints += gddConstants.AP_PER_LEVEL;
+        state.player.xpToNextLevel = Math.floor(gddConstants.XP_BASE * Math.pow(gddConstants.XP_GROWTH_RATE, state.player.level));
+        showToast(`⬆ Level Up! Promoted to Level ${state.player.level}`);
+      }
+
+      this.isEngaged = false;
+      actionRow.classList.add('standby');
+      engageBtn.textContent = 'BATTLE';
+      engageBtn.classList.remove('active');
+
+    } else if (res.status === 'DEFEAT') {
+      state.battleStats.deaths++;
+      DataManager.saveBattleStats();
+      if (l1) l1.innerHTML = damageTaken > 0 ? `<span class="text-rose-400 font-bold">${monsterName}</span> hit you for <span class="text-rose-400 font-bold">${damageTaken}</span> dmg!` : '';
+      if (l2) l2.innerHTML = `Chassis Integrity Depleted!`;
+      if (l3) l3.innerHTML = `<span class="text-rose-500 font-extrabold uppercase">Defeated! Press BATTLE</span>`;
+      showToast('Integrity collapsed. Regenerating...', true);
+      state.player.hp = state.player.derivedStats.maxHp;
+      this.isEngaged = false;
+      actionRow.classList.add('standby');
+      engageBtn.textContent = 'BATTLE';
+      engageBtn.classList.remove('active');
+    } else {
+      if (l1) l1.innerHTML = damageTaken > 0 ? `<span class="text-rose-400 font-bold">${monsterName}</span> hit you for <span class="text-rose-400 font-bold">${damageTaken}</span> dmg!` : `Enemy missed attack!`;
+      if (l2) l2.innerHTML = `You hit <span class="text-white font-bold">${monsterName}</span> for <span class="text-white font-bold">${damageDealt}</span> dmg!`;
+      if (l3) l3.innerHTML = `<span class="text-slate-400 font-mono text-[10px]">Enemy Remaining HP: ${Math.max(0, Math.round(this.currentMonster.currentHP))}</span>`;
+    }
+
+    this.updateStatsDisplay();
+    UIManager.updatePlayerStatusUI();
+    DataManager.updatePlayer(state.player);
+  }
+};
+
+window.handleItemTap = (instanceId) => {
+  if (!instanceId) return;
+  const item = state.player.inventory.find(i => i.instanceId === instanceId);
+  if (!item) return;
+  const base = items.baseItemTemplates.find(b => b.id === item.baseItemId);
+  const isEquipped = Object.values(state.player.equipment).includes(instanceId);
+  const icon = getItemVectorIcon(base?.subType, base?.type);
+  const body = document.getElementById('item-action-modal-body');
+  body.innerHTML = `<h3 class="font-orbitron font-bold text-white text-sm mb-1">${base?.name || 'Item'}</h3>
+    <p class="text-xs text-zinc-300 mb-1">Tier ${item.tier} · ${base?.type || ''} (${base?.subType || ''})</p>
+    <div class="my-3 flex justify-center items-center py-3 bg-black/60 rounded-xl border border-white/14">${icon}</div>
+    <div class="flex gap-2 mt-3">
+      <button id="equip-btn" class="glass-button flex-1 py-2 text-xs font-semibold">${isEquipped ? 'Unequip Piece' : 'Equip Piece'}</button>
+      <button id="modal-cancel-btn" class="glass-button px-3 py-2 text-xs text-zinc-400">Cancel</button>
+    </div>`;
+  document.getElementById('item-action-modal-backdrop').classList.remove('hidden');
+  document.getElementById('item-action-modal-content').classList.remove('hidden');
+  document.getElementById('modal-cancel-btn').onclick = () => {
+    document.getElementById('item-action-modal-backdrop').classList.add('hidden');
+    document.getElementById('item-action-modal-content').classList.add('hidden');
+  };
+  document.getElementById('equip-btn').onclick = () => {
+    if (isEquipped) {
+      for (const slot in state.player.equipment) {
+        if (state.player.equipment[slot] === instanceId) state.player.equipment[slot] = null;
+      }
+      showToast(`${base.name} unequipped.`);
+    } else {
+      let targetSlot = null;
+      if (base.type === 'Weapons') targetSlot = !state.player.equipment['Weapon 1'] ? 'Weapon 1' : (!state.player.equipment['Weapon 2'] ? 'Weapon 2' : 'Weapon 1');
+      else if (base.type === 'Spells') targetSlot = !state.player.equipment['Spell 1'] ? 'Spell 1' : (!state.player.equipment['Spell 2'] ? 'Spell 2' : 'Spell 1');
+      else if (base.subType === 'Gauntlets') targetSlot = 'Gloves';
+      else if (base.subType === 'Rune') targetSlot = 'Accessory';
+      else targetSlot = equipmentSlotConfig.find(s => s.name === base.subType || s.name === base.type)?.name;
+      if (targetSlot) {
+        state.player.equipment[targetSlot] = instanceId;
+        showToast(`${base.name} equipped to ${targetSlot}.`);
+      }
+    }
+    Systems.calculateDerivedStats(state.player);
+    if (InlinePanelManager.activeTab === 'equipment') InlinePanelManager.renderEquipment();
+    CombatManager.updateStatsDisplay();
+    document.getElementById('item-action-modal-backdrop').classList.add('hidden');
+    document.getElementById('item-action-modal-content').classList.add('hidden');
+    DataManager.updatePlayer(state.player);
+  };
+};
+
+window.handleGemTap = (gemId, grade) => {
+  const gemData = gems.standard[gemId];
+  if (!gemData) return;
+  const body = document.getElementById('item-action-modal-body');
+  body.innerHTML = `<h3 class="font-orbitron font-bold text-white text-sm mb-1">${gemData.name}</h3>
+    <p class="text-xs text-zinc-300 mb-2">Grade ${grade} · ${gemData.category} Gem</p>
+    <p class="text-[11px] text-zinc-300 p-2 rounded-lg bg-black/60 border border-white/14 mb-3">${gemData.effect}</p>
+    <button onclick="document.getElementById('item-action-modal-backdrop').click()" class="glass-button w-full py-2 text-xs font-semibold">Close</button>`;
+  document.getElementById('item-action-modal-backdrop').classList.remove('hidden');
+  document.getElementById('item-action-modal-content').classList.remove('hidden');
+};
+
+document.getElementById('item-action-modal-backdrop')?.addEventListener('click', () => {
+  document.getElementById('item-action-modal-backdrop').classList.add('hidden');
+  document.getElementById('item-action-modal-content').classList.add('hidden');
+});
+
+window.spendPoint = (attr) => {
+  const p = state.player;
+  if ((p.attributePoints || 0) < gddConstants.AP_PER_LEVEL) return;
+  const weights = (races[p.race] || races.human).apAllocationWeights;
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  const scale = gddConstants.AP_PER_LEVEL / total;
+  for (const k in weights) { p.baseStats[k] = (p.baseStats[k] || 10) + weights[k] * scale; }
+  p.attributePoints -= gddConstants.AP_PER_LEVEL;
+  Systems.calculateDerivedStats(p);
+  CombatManager.updateStatsDisplay();
+  showToast("Core attributes upgraded.");
+  DataManager.updatePlayer(p);
+};
+
+class MapRenderer {
+  constructor(canvas, isMini = false) { this.canvas = canvas; this.ctx = canvas?.getContext('2d'); this.isMini = isMini; }
+  resize() {
+    if (!this.canvas || !this.canvas.parentElement) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.canvas.parentElement.clientWidth;
+    const h = this.canvas.parentElement.clientHeight;
+    this.canvas.width = w * dpr; this.canvas.height = h * dpr;
+    this.ctx?.resetTransform();
+    this.ctx?.scale(dpr, dpr);
+  }
+  draw(pos) {
+    if (!this.ctx || !pos) return;
+    const w = this.canvas.parentElement.clientWidth;
+    const h = this.canvas.parentElement.clientHeight;
+    this.ctx.clearRect(0, 0, w, h);
+    if (this.isMini) {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2);
+      this.ctx.clip();
+      this.ctx.fillStyle = '#050508';
+      this.ctx.fillRect(0, 0, w, h);
+      this.ctx.restore();
+      return;
+    }
+    const t = 28;
+    const ox = w / 2 - pos.x * t - t / 2;
+    const oy = h / 2 - pos.y * t - t / 2;
+    this.ctx.save();
+    this.ctx.translate(ox, oy);
+    for (let x = 0; x < 16; x++) {
+      for (let y = 0; y < 16; y++) {
+        const isCurrentCell = (x === pos.x && y === pos.y);
+        if (isCurrentCell) {
+          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+          this.ctx.fillRect(x * t, y * t, t, t);
+        }
+        this.ctx.strokeStyle = isCurrentCell ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.12)';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x * t, y * t, t, t);
+      }
+    }
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.beginPath();
+    this.ctx.arc(pos.x * t + t / 2, pos.y * t + t / 2, t * 0.32, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+}
+
+const WorldMapManager = {
+  mapRenderer: null,
+  init() {
+    const c = document.getElementById('mini-map-canvas');
+    if (!c) return;
+    this.mapRenderer = new MapRenderer(c, true);
+    this.resize();
+    this.draw();
+  },
+  resize() { this.mapRenderer?.resize(); this.draw(); },
+  draw() { if (state.player) this.mapRenderer?.draw(state.player.pos); }
+};
+
+const ZoneManager = {
+  mapRenderer: null,
+  init() {
+    const c = document.getElementById('zone-canvas');
+    if (!c) return;
+    this.mapRenderer = new MapRenderer(c, false);
+    this.resizeCanvas();
+  },
+  resizeCanvas() { this.mapRenderer?.resize(); },
+  draw() { if (state.player) this.mapRenderer?.draw(state.player.pos); }
+};
+
+function initMovementControls() {
+  const move = (dx, dy) => {
+    if (!state.player) return;
+    state.player.pos.x = Math.max(0, Math.min(15, state.player.pos.x + dx));
+    state.player.pos.y = Math.max(0, Math.min(15, state.player.pos.y + dy));
+    WorldMapManager.draw();
+    ZoneManager.draw();
+    UIManager.updatePlayerStatusUI();
+  };
+  const bind = (k, fn) => {
+    document.querySelectorAll(`[data-key="${k}"]`).forEach(btn => {
+      btn.addEventListener('click', e => { e.preventDefault(); fn(); });
+      btn.addEventListener('touchstart', e => { e.preventDefault(); fn(); }, { passive: false });
+    });
+  };
+  bind('up', () => move(0, -1));
+  bind('down', () => move(0, 1));
+  bind('left', () => move(-1, 0));
+  bind('right', () => move(1, 0));
+  bind('enter', () => showToast("Interacting with sector waypoint."));
+  window.addEventListener('keydown', (e) => {
+    if (document.activeElement.tagName === 'INPUT') return;
+    if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1);
+    if (e.key === 'ArrowDown' || e.key === 's') move(0, 1);
+    if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0);
+    if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0);
+    if (e.key === 'Enter' || e.key === ' ') showToast("Interacting with sector waypoint.");
+  });
+}
+
+const ChatManager = {
+  SUBS: {
+    main: [['feed','Main Chat'],['settings','Name Color']],
+    sales: [['chat','Sales Chat'],['auction','Auction']],
+    clan: [['chat','Clan Chat'],['wars','Wars'],['contrib','Contributions']],
+    groups: [['g1',''],['g2',''],['g3',''],['g4','']]
+  },
+  init() {
+    const self = this;
+    document.getElementById('footer-message-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('footer-message-input');
+      const val = input.value.trim();
+      if (!val) return;
+      self.postMessage(val);
+      input.value = '';
+    });
+    document.getElementById('overlay-message-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('overlay-message-input');
+      const val = input.value.trim();
+      if (!val) return;
+      self.postMessage(val);
+      input.value = '';
+    });
+    document.querySelectorAll('.footer-tab-button[data-channel], .overlay-tab-button').forEach(tab => {
+      tab.addEventListener('click', () => self.switchChannel(tab.dataset.channel));
+    });
+    const overlay = document.getElementById('full-screen-chat-overlay');
+    document.getElementById('expand-chat-btn')?.addEventListener('click', () => {
+      overlay?.classList.remove('hidden');
+      overlay?.classList.add('flex');
+      self.renderSubs();
+      self.renderCurrentMessages();
+    });
+    document.getElementById('chat-overlay-close-btn')?.addEventListener('click', () => {
+      overlay?.classList.add('hidden');
+      overlay?.classList.remove('flex');
+    });
+    document.getElementById('inbox-btn')?.addEventListener('click', () => self.setInbox(!state.chat.inboxOpen));
+    document.getElementById('ov-inbox-btn')?.addEventListener('click', () => self.setInbox(!state.chat.inboxOpen));
+    this.bindHold(document.getElementById('chat-subs'));
+    this.bindHold(document.getElementById('ov-chat-subs'));
+    document.getElementById('rename-cancel')?.addEventListener('click', () => self.closeRename());
+    document.getElementById('rename-save')?.addEventListener('click', () => {
+      const v = document.getElementById('rename-input').value.trim();
+      if (v && state.chat.renameTarget) {
+        state.chat.groups[state.chat.renameTarget] = v.slice(0,18);
+        localStorage.setItem('g_groups', JSON.stringify(state.chat.groups));
+      }
+      self.closeRename();
+      self.renderSubs();
+      self.renderCurrentMessages();
+    });
+    this.initEmoji();
+    this.renderSubs();
+    this.renderCurrentMessages();
+  },
+  setInbox(open) {
+    state.chat.inboxOpen = open;
+    document.getElementById('inbox-pane')?.classList.toggle('hidden', !open);
+    document.getElementById('ov-inbox-pane')?.classList.toggle('hidden', !open);
+    document.getElementById('footer-chat-content-wrapper')?.classList.toggle('hidden', open);
+    document.getElementById('fullscreen-chat-content-wrapper')?.classList.toggle('hidden', open);
+    document.getElementById('chat-subs')?.classList.toggle('hidden', open);
+    document.getElementById('ov-chat-subs')?.classList.toggle('hidden', open);
+    if (open) {
+      document.getElementById('group-hint')?.classList.add('hidden');
+      document.getElementById('ov-group-hint')?.classList.add('hidden');
+    } else this.renderSubs();
+    document.querySelectorAll('.inbox-btn').forEach(b => b.classList.toggle('active', open));
+  },
+  switchChannel(channel) {
+    if (!channel) return;
+    if (state.chat.inboxOpen) this.setInbox(false);
+    state.chat.currentChannel = channel;
+    document.querySelectorAll('.footer-tab-button[data-channel], .overlay-tab-button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.channel === channel);
+    });
+    this.renderSubs();
+    this.renderCurrentMessages();
+  },
+  renderSubs() {
+    const ch = state.chat.currentChannel || 'main';
+    const html = (this.SUBS[ch] || []).map(([id,label]) => {
+      const gold = id==='auction' ? 'gold' : '';
+      const name = ch==='groups' ? state.chat.groups[id] : label;
+      const hold = ch==='groups' ? ` data-hold="${id}"` : '';
+      return `<button type="button" class="sub-btn ${state.chat.sub[ch]===id?'active':''} ${gold}" data-sub="${id}"${hold}><span class="truncate">${name}</span></button>`;
+    }).join('');
+    const a = document.getElementById('chat-subs');
+    const b = document.getElementById('ov-chat-subs');
+    if (a) a.innerHTML = html;
+    if (b) b.innerHTML = html;
+    const showHint = ch === 'groups' && !state.chat.inboxOpen;
+    document.getElementById('group-hint')?.classList.toggle('hidden', !showHint);
+    document.getElementById('ov-group-hint')?.classList.toggle('hidden', !showHint);
+  },
+  bindHold(container) {
+    if (!container || container.dataset.bound) return;
+    container.dataset.bound = '1';
+    let holdTimer = null, holdFired = false;
+    container.addEventListener('pointerdown', (e) => {
+      const b = e.target.closest('[data-hold]');
+      if (!b || !b.dataset.hold) return;
+      holdFired = false;
+      holdTimer = setTimeout(() => { holdFired = true; this.openRename(b.dataset.hold); }, 520);
+    });
+    const cancel = () => { if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; } };
+    container.addEventListener('pointerup', cancel);
+    container.addEventListener('pointerleave', cancel);
+    container.addEventListener('pointercancel', cancel);
+    container.addEventListener('click', (e) => {
+      if (holdFired) { e.preventDefault(); holdFired = false; return; }
+      const b = e.target.closest('[data-sub]');
+      if (!b) return;
+      state.chat.sub[state.chat.currentChannel] = b.dataset.sub;
+      this.renderSubs();
+      this.renderCurrentMessages();
+    });
+  },
+  openRename(id) {
+    state.chat.renameTarget = id;
+    const m = document.getElementById('rename-modal');
+    document.getElementById('rename-input').value = state.chat.groups[id];
+    m.classList.remove('hidden'); m.classList.add('flex');
+  },
+  closeRename() {
+    const m = document.getElementById('rename-modal');
+    m.classList.add('hidden'); m.classList.remove('flex');
+  },
+  settingsHTML() {
+    const c = state.chat.nameColor;
+    return `<div class="ios-sheet ios-picker w-full p-3.5 relative z-10">
+      <div class="flex items-center justify-between mb-3">
+        <button type="button" class="eyedrop-btn w-8 h-8 rounded-full bg-[#2c2c2e] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2"><path d="M2 22l5.5-5.5"/><path d="M18.4 3.6a2.8 2.8 0 0 1 4 4L8 22H4v-4L18.4 3.6z"/></svg>
+        </button>
+        <div class="text-[17px] font-semibold text-white">Colors</div><div class="w-8"></div>
+      </div>
+      <div class="ios-seg mb-3">
+        <button type="button" class="on" data-picktab="grid">Grid</button>
+        <button type="button" data-picktab="spectrum">Spectrum</button>
+        <button type="button" data-picktab="sliders">Sliders</button>
+      </div>
+      <div class="pick-grid"><div class="color-grid overflow-hidden rounded-[10px] grid" style="grid-template-columns:repeat(12,1fr);gap:0;"></div></div>
+      <div class="pick-spectrum hidden flex-col items-center"><canvas class="hue-wheel ios-spectrum" width="336" height="336"></canvas></div>
+      <div class="pick-sliders hidden">
+        <div class="rgb-row"><span>R</span><input class="r-range" type="range" min="0" max="255"><input class="r-num" type="number" min="0" max="255"></div>
+        <div class="rgb-row"><span>G</span><input class="g-range" type="range" min="0" max="255"><input class="g-num" type="number" min="0" max="255"></div>
+        <div class="rgb-row"><span>B</span><input class="b-range" type="range" min="0" max="255"><input class="b-num" type="number" min="0" max="255"></div>
+      </div>
+      <div class="mt-3 text-[11px] tracking-wide text-[#8e8e93]">OPACITY</div>
+      <div class="flex items-center gap-2 mt-1">
+        <input class="ios-op opacity-slider" type="range" min="0" max="100" value="100">
+        <div class="opacity-label text-xs bg-[#2c2c2e] rounded-lg px-2 py-1 text-white w-12 text-center">100%</div>
+      </div>
+      <div class="h-px bg-white/10 my-3"></div>
+      <div class="flex items-center gap-3">
+        <div class="big-swatch w-12 h-12 rounded-lg border border-white/15" style="background:${c}"></div>
+        <div class="preset-row flex flex-wrap gap-2"></div>
+      </div>
+    </div>`;
+  },
+  hsvToHex(h,s,v){const f=(n,k=(n+h/60)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0);const r=Math.round(f(5)*255),g=Math.round(f(3)*255),b=Math.round(f(1)*255);return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');},
+  rgbToHex(r,g,b){return '#'+[r,g,b].map(x=>Math.max(0,Math.min(255,x|0)).toString(16).padStart(2,'0')).join('');},
+  hexToRgb(hex){return {r:parseInt(hex.slice(1,3),16),g:parseInt(hex.slice(3,5),16),b:parseInt(hex.slice(5,7),16)};},
+  applyColor(hex){
+    state.chat.nameColor = hex;
+    localStorage.setItem('g_name', hex);
+    document.querySelectorAll('.big-swatch').forEach(el => el.style.background = hex);
+    document.querySelectorAll('.opacity-slider').forEach(el => el.style.setProperty('--pick', hex));
+  },
+  mountPicker(root) {
+    if (!root || root.dataset.mounted) return;
+    root.dataset.mounted = '1';
+    const grid = root.querySelector('.color-grid');
+    const hues = [205,225,255,280,320,0,22,35,48,72,118,150];
+    let html = '';
+    for (let r=0;r<10;r++) for (let c=0;c<12;c++) {
+      let hex;
+      if (r===0) { const steps=[255,235,209,199,174,142,99,72,58,44,28,0]; hex=this.rgbToHex(steps[c],steps[c],steps[c]); }
+      else { const v=[0.28,0.38,0.48,0.58,0.70,0.82,0.92,0.97,1][r-1]; const s=[1,1,1,1,1,0.95,0.72,0.45,0.28][r-1]; hex=this.hsvToHex(hues[c],s,v); }
+      html += `<button type="button" class="swatch" data-hex="${hex}" style="background:${hex}"></button>`;
+    }
+    grid.innerHTML = html;
+    grid.onclick = (e) => { const s=e.target.closest('.swatch'); if(s) this.applyColor(s.dataset.hex); };
+    const presets = ['#000000','#0A84FF','#30D158','#FFD60A','#FF3B30','#BF5AF2','#FF9F0A','#FFFFFF','#FF375F','#A2845E'];
+    const row = root.querySelector('.preset-row');
+    row.innerHTML = presets.map(h => `<button type="button" class="preset-dot" data-hex="${h}" style="background:${h}"></button>`).join('');
+    row.onclick = (e) => { const b=e.target.closest('[data-hex]'); if(b) this.applyColor(b.dataset.hex); };
+    root.querySelectorAll('[data-picktab]').forEach(btn => {
+      btn.onclick = () => {
+        const name = btn.dataset.picktab;
+        root.querySelectorAll('[data-picktab]').forEach(b => b.classList.toggle('on', b===btn));
+        root.querySelector('.pick-grid').classList.toggle('hidden', name!=='grid');
+        root.querySelector('.pick-spectrum').classList.toggle('hidden', name!=='spectrum');
+        root.querySelector('.pick-sliders').classList.toggle('hidden', name!=='sliders');
+        if (name==='spectrum') this.paintWheel(root.querySelector('.ios-spectrum'));
+      };
+    });
+    const pull = () => this.applyColor(this.rgbToHex(+root.querySelector('.r-range').value,+root.querySelector('.g-range').value,+root.querySelector('.b-range').value));
+    ['r','g','b'].forEach(ch => { root.querySelector('.'+ch+'-range').oninput = pull; });
+    this.applyColor(state.chat.nameColor);
+  },
+  paintWheel(canvas) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d'); const size=canvas.width; const cx=size/2,cy=size/2,radius=size/2-4;
+    const img = ctx.createImageData(size,size);
+    for (let y=0;y<size;y++) for (let x=0;x<size;x++) {
+      const dx=x-cx,dy=y-cy,dist=Math.sqrt(dx*dx+dy*dy),i=(y*size+x)*4;
+      if (dist>radius){img.data[i+3]=0;continue;}
+      let hue=Math.atan2(dy,dx)*180/Math.PI; if(hue<0)hue+=360;
+      const hex=this.hsvToHex(hue,dist/radius,1);
+      img.data[i]=parseInt(hex.slice(1,3),16); img.data[i+1]=parseInt(hex.slice(3,5),16); img.data[i+2]=parseInt(hex.slice(5,7),16); img.data[i+3]=255;
+    }
+    ctx.putImageData(img,0,0);
+    canvas.onpointerdown = canvas.onpointermove = (e) => {
+      if (e.type==='pointermove' && !e.buttons) return;
+      const rect=canvas.getBoundingClientRect(); const scale=size/rect.width;
+      const x=(e.clientX-rect.left)*scale, y=(e.clientY-rect.top)*scale;
+      const dx=x-cx,dy=y-cy,dist=Math.sqrt(dx*dx+dy*dy); if(dist>radius)return;
+      let hue=Math.atan2(dy,dx)*180/Math.PI; if(hue<0)hue+=360;
+      this.applyColor(this.hsvToHex(hue,dist/radius,1));
+    };
+  },
+  renderCurrentMessages() {
+    const ch = state.chat.currentChannel || 'main';
+    const sub = state.chat.sub[ch];
+    const hideForm = ['settings','auction','wars','contrib'].includes(sub);
+    const form = document.getElementById('footer-message-form');
+    if (form) form.style.display = hideForm || state.chat.inboxOpen ? 'none' : 'flex';
+    let html = '';
+    if (ch==='main' && sub==='settings') html = this.settingsHTML();
+    else if (ch==='sales' && sub==='auction') html = `<div class="empty">No live lots</div>`;
+    else if (ch==='clan' && sub==='wars') html = `<div class="empty">No active war</div>`;
+    else if (ch==='clan' && sub==='contrib') html = `<div class="empty">No contributions yet</div>`;
+    else {
+      const key = ch==='groups' ? sub : ch;
+      const msgs = state.chat.messages[key] || [];
+      html = msgs.length ? msgs.map(m => {
+        const color = m.color || state.chat.nameColor;
+        return `<div class="my-1"><span style="color:${color};font-weight:800">${m.sender}:</span> <span class="text-white">${m.text}</span></div>`;
+      }).join('') : `<div class="empty"></div>`;
+    }
+    const footerWrapper = document.getElementById('footer-chat-content-wrapper');
+    const overlayWrapper = document.getElementById('fullscreen-chat-content-wrapper');
+    if (footerWrapper) footerWrapper.innerHTML = html;
+    if (overlayWrapper) overlayWrapper.innerHTML = html;
+    document.querySelectorAll('.ios-picker').forEach(p => this.mountPicker(p));
+    if (footerWrapper) footerWrapper.scrollTop = footerWrapper.scrollHeight;
+    if (overlayWrapper) overlayWrapper.scrollTop = overlayWrapper.scrollHeight;
+  },
+  postMessage(text) {
+    const ch = state.chat.currentChannel || 'main';
+    const sub = state.chat.sub[ch];
+    const key = ch==='groups' ? sub : ch;
+    const senderName = state.player?.name || 'Jeff';
+    if (!state.chat.messages[key]) state.chat.messages[key] = [];
+    state.chat.messages[key].push({ sender: senderName, text, color: state.chat.nameColor, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+    if (state.chat.messages[key].length > 150) state.chat.messages[key].shift();
+    this.renderCurrentMessages();
+  },
+  initEmoji() {
+    const self = this;
+    const backdrop = document.createElement('div');
+    backdrop.id = 'emoji-backdrop';
+    backdrop.className = 'hidden';
+    const sheet = document.createElement('div');
+    sheet.id = 'emoji-sheet';
+    sheet.className = 'hidden';
+    sheet.innerHTML = '<div class="emoji-sheet-bar"><button type="button" id="emoji-close" class="chat-expand-btn" style="width:28px;height:28px">✕</button></div><emoji-picker></emoji-picker>';
+    document.body.appendChild(backdrop);
+    document.body.appendChild(sheet);
+    const close = () => {
+      sheet.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    };
+    const place = (btn) => {
+      const r = (btn || document.getElementById('emoji-btn')).getBoundingClientRect();
+      const w = Math.min(360, window.innerWidth - 24);
+      let left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12));
+      let top = r.top - 286;
+      if (top < 12) top = Math.min(r.bottom + 8, window.innerHeight - 290);
+      sheet.style.left = left + 'px';
+      sheet.style.top = top + 'px';
+      sheet.style.bottom = 'auto';
+    };
+    sheet.querySelector('emoji-picker')?.addEventListener('emoji-click', (e) => {
+      const overlayOn = !document.getElementById('full-screen-chat-overlay').classList.contains('hidden');
+      const input = overlayOn ? document.getElementById('overlay-message-input') : document.getElementById('footer-message-input');
+      if (input) { input.value += e.detail.unicode; input.focus(); }
+      close();
+    });
+    document.getElementById('emoji-close').onclick = close;
+    backdrop.onclick = close;
+    document.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!sheet.classList.contains('hidden')) { close(); return; }
+        place(btn);
+        sheet.classList.remove('hidden');
+        backdrop.classList.remove('hidden');
+      };
+    });
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+  }
+};
+
+const UIManager = {
+  updatePlayerStatusUI() {
+    if (!state.player) return;
+    const p = state.player;
+    const nameEl = document.getElementById('player-name-display');
+    if (nameEl) {
+      nameEl.textContent = `${p.name}:`;
+      nameEl.className = 'text-white font-bold text-xs';
+    }
+    const lvlEl = document.getElementById('player-level-display');
+    if (lvlEl) { 
+      lvlEl.textContent = `Level ${p.level}`; 
+      lvlEl.className = 'text-slate-300 text-[10.5px] font-medium font-mono ml-1';
+      lvlEl.style.color = '#cbd5e1';
+      lvlEl.style.textShadow = 'none';
+    }
+    const raceInfo = races[p.race];
+    const raceEl = document.getElementById('player-race-value');
+    if (raceEl) { 
+      raceEl.textContent = raceInfo?.raceName || p.race; 
+      raceEl.className = 'text-slate-300 text-[10.5px] font-medium ml-1';
+      raceEl.style.color = '#cbd5e1'; 
+    }
+    const aspecEl = document.getElementById('player-aspec-value');
+    if (aspecEl) { 
+      aspecEl.textContent = `${p.archetype} · ${p.cci || 'DEX'}`; 
+      aspecEl.className = 'text-slate-300 text-[10.5px] font-medium ml-1';
+      aspecEl.style.color = '#cbd5e1'; 
+    }
+    const zoneEl = document.getElementById('zone-name-value');
+    if (zoneEl) { 
+      zoneEl.textContent = state.zone.name; 
+      zoneEl.className = 'text-slate-300 text-[10.5px] font-medium ml-1';
+      zoneEl.style.color = '#cbd5e1'; 
+      zoneEl.style.textShadow = 'none';
+    }
+    const coordsEl = document.getElementById('player-coords-value');
+    if (coordsEl) { 
+      coordsEl.textContent = `[${p.pos.x}, ${p.pos.y}]`; 
+      coordsEl.className = 'text-slate-300 text-[10.5px] font-medium font-mono ml-1';
+      coordsEl.style.color = '#cbd5e1'; 
+      coordsEl.style.textShadow = 'none';
+    }
+  }
+};
+
+window.toggleBattleMode = () => {
+  state.battleMode = !state.battleMode;
+  const navDeck = document.getElementById('hud-nav-deck');
+  const tabsRow = document.getElementById('hud-tabs-row');
+  const label = document.getElementById('battle-mode-label');
+  const btn = document.getElementById('battle-mode-toggle-btn');
+  const desc = document.getElementById('battle-mode-desc');
+  if (state.battleMode) {
+    InlinePanelManager.close();
+    if (navDeck) navDeck.style.display = 'none';
+    if (tabsRow) tabsRow.style.display = 'none';
+    if (label) label.textContent = 'Exit Battle Mode';
+    if (btn) {
+      btn.classList.add('!bg-red-500/25', '!border-red-400/80', '!text-red-200');
+      btn.style.boxShadow = '0 0 14px rgba(255, 55, 95, 0.6), inset 0 0 6px rgba(255, 55, 95, 0.3)';
+    }
+    if (desc) desc.textContent = 'Active: Navigation and tab controls hidden for streamlined battle.';
+    showToast('⚔️ Battle Mode active.');
+  } else {
+    if (navDeck) navDeck.style.display = 'flex';
+    if (tabsRow) tabsRow.style.display = 'flex';
+    if (label) label.textContent = 'Battle Mode';
+    if (btn) {
+      btn.classList.remove('!bg-red-500/25', '!border-red-400/80', '!text-red-200');
+      btn.style.boxShadow = '';
+    }
+    if (desc) desc.textContent = 'Streamlines HUD to stats, combat console, and transmissions for fast combat.';
+    showToast('Battle Mode deactivated.');
+    setTimeout(() => { WorldMapManager.resize(); WorldMapManager.draw(); }, 50);
+  }
+};
+
+const GameManager = {
+  init() {
+    Systems.calculateDerivedStats(state.player);
+    UIManager.updatePlayerStatusUI();
+    WorldMapManager.init();
+    ZoneManager.init();
+    initMovementControls();
+    ChatManager.init();
+    InlinePanelManager.init();
+    CombatManager.init();
+    document.getElementById('mini-map-panel')?.addEventListener('click', () => {
+      document.getElementById('full-screen-map-overlay').classList.remove('hidden');
+      document.getElementById('full-screen-map-overlay').classList.add('flex');
+      ZoneManager.resizeCanvas();
+      ZoneManager.draw();
+    });
+    document.getElementById('map-close-btn')?.addEventListener('click', () => {
+      document.getElementById('full-screen-map-overlay').classList.add('hidden');
+      document.getElementById('full-screen-map-overlay').classList.remove('flex');
+    });
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  DataManager.init();
+});
+</script>
+</body>
+</html>
